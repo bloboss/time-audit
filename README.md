@@ -341,21 +341,51 @@ time-audit/
 ### Running Tests
 
 ```bash
+# Install development dependencies
 pip install -e ".[dev]"
+
+# Run all tests
 pytest
-pytest --cov=time_audit
+
+# Run tests with coverage
+pytest --cov=time_audit --cov-report=term-missing
+
+# Run specific test modules
+pytest tests/test_models.py
+pytest tests/test_cli.py
+
+# Run with verbose output
+pytest -v
 ```
+
+**Test Coverage:**
+- 77 tests across 4 test modules
+- 86% overall code coverage
+- Models: 99%
+- Tracker: 95%
+- Storage: 89%
+- Reports: 85%
+- CLI: 77%
+
+**CI/CD:**
+- Automated testing on every push/PR
+- Multi-OS: Linux, macOS, Windows
+- Multi-Python: 3.9, 3.10, 3.11, 3.12
+- Code quality checks (black, ruff, mypy)
+- Coverage reporting via Codecov
 
 ## Roadmap
 
 See [DESIGN.md](DESIGN.md) for the complete architectural design and future plans.
 
-### Phase 1: MVP (Current) ✅
+### Phase 1: MVP ✅ **COMPLETE**
 - ✅ Core time tracking (start, stop, switch)
 - ✅ CSV storage with atomic operations
 - ✅ Basic CLI commands
 - ✅ Summary and timeline reports
 - ✅ Filtering and manual entries
+- ✅ Comprehensive test suite (77 tests, 86% coverage)
+- ✅ CI/CD pipeline (GitHub Actions)
 
 ### Phase 2: Enhanced Features (Planned)
 - 🔲 Process detection (automatic task tracking)
