@@ -11,6 +11,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from time_audit.analysis.reports import ReportGenerator
+from time_audit.cli.config_commands import config
 from time_audit.core.storage import StorageManager
 from time_audit.core.tracker import TimeTracker
 
@@ -47,7 +48,7 @@ def format_datetime(dt: datetime) -> str:
 
 
 @click.group()
-@click.version_option(version="0.1.0")
+@click.version_option(version="0.2.0-dev")
 @click.option("--data-dir", help="Custom data directory", type=click.Path())
 @click.option("--no-color", is_flag=True, help="Disable colored output")
 @click.pass_context
@@ -459,6 +460,10 @@ def report(
         # For timeline, use today if period is not specified
         target_date = start_date if start_date else datetime.now()
         report_gen.timeline_report(entries, target_date)
+
+
+# Register config command group
+cli.add_command(config)
 
 
 if __name__ == "__main__":
