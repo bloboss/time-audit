@@ -15,6 +15,7 @@ from time_audit.core.storage import StorageManager
 from time_audit.core.tracker import TimeTracker
 
 console = Console()
+error_console = Console(stderr=True)
 
 
 def get_tracker(data_dir: Optional[str] = None) -> TimeTracker:
@@ -96,7 +97,7 @@ def start(
         console.print(f"  Started: {format_datetime(entry.start_time)}")
 
     except ValueError as e:
-        console.print(f"[red]Error:[/red] {e}", file=sys.stderr)
+        error_console.print(f"[red]Error:[/red] {e}")
         sys.exit(1)
 
 
@@ -121,7 +122,7 @@ def stop(ctx: click.Context, notes: Optional[str]) -> None:
             console.print(f"  Project: {entry.project}")
 
     except ValueError as e:
-        console.print(f"[red]Error:[/red] {e}", file=sys.stderr)
+        error_console.print(f"[red]Error:[/red] {e}")
         sys.exit(1)
 
 
@@ -344,7 +345,7 @@ def add(
         console.print(f"  Time: {format_datetime(start_time)} → {format_datetime(end_time)}")
 
     except ValueError as e:
-        console.print(f"[red]Error:[/red] {e}", file=sys.stderr)
+        error_console.print(f"[red]Error:[/red] {e}")
         sys.exit(1)
 
 
