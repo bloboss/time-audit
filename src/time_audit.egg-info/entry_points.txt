@@ -1,2 +1,0 @@
-[console_scripts]
-time-audit = time_audit.cli.main:cli
