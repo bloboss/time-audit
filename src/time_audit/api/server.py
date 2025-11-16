@@ -49,12 +49,14 @@ def create_app(config: Optional[ConfigManager] = None) -> FastAPI:
     setup_middleware(app, config)
 
     # Register routers
-    from time_audit.api.endpoints import categories, entries, projects, system
+    from time_audit.api.endpoints import analytics, categories, entries, projects, reports, system
 
     app.include_router(system.router, prefix="/api/v1", tags=["system"])
     app.include_router(entries.router, prefix="/api/v1/entries", tags=["entries"])
     app.include_router(projects.router, prefix="/api/v1/projects", tags=["projects"])
     app.include_router(categories.router, prefix="/api/v1/categories", tags=["categories"])
+    app.include_router(reports.router, prefix="/api/v1/reports", tags=["reports"])
+    app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
 
     # Root endpoint
     @app.get("/", include_in_schema=False)

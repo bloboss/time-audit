@@ -8,9 +8,17 @@ Available routers:
 - entries: Time entry CRUD and tracking
 - projects: Project management
 - categories: Category management
-- reports: Reports and analytics (Week 3)
+- reports: Report generation and summaries
+- analytics: Productivity analytics and trends
 """
 
-__all__ = ["system", "entries", "projects", "categories"]
+__all__ = ["system", "entries", "projects", "categories", "reports", "analytics"]
 
-from time_audit.api.endpoints import categories, entries, projects, system  # noqa: F401
+from time_audit.api.endpoints import (  # noqa: F401
+    analytics,
+    categories,
+    entries,
+    projects,
+    reports,
+    system,
+)

@@ -243,3 +243,103 @@ class ErrorResponse(BaseModel):
 
     detail: str = Field(..., description="Error message")
     error_code: Optional[str] = Field(None, description="Machine-readable error code")
+
+
+# ============================================================================
+# Report Models
+# ============================================================================
+
+
+class ProjectBreakdown(BaseModel):
+    """Project breakdown in reports."""
+
+    project: str
+    duration_seconds: int
+    percentage: float
+    entry_count: int
+
+
+class CategoryBreakdown(BaseModel):
+    """Category breakdown in reports."""
+
+    category: str
+    duration_seconds: int
+    percentage: float
+    entry_count: int
+
+
+class SummaryReportResponse(BaseModel):
+    """Response model for summary reports."""
+
+    period_label: str
+    total_duration_seconds: int
+    active_duration_seconds: int
+    idle_duration_seconds: int
+    total_entries: int
+    unique_tasks: int
+    active_percentage: float
+    projects: list[ProjectBreakdown]
+    categories: list[CategoryBreakdown]
+
+
+class TimelineEntry(BaseModel):
+    """Entry in timeline report."""
+
+    timestamp: datetime
+    label: str
+    duration_seconds: int
+    entry_count: int
+
+
+class TimelineReportResponse(BaseModel):
+    """Response model for timeline reports."""
+
+    period_label: str
+    granularity: str  # "hourly", "daily", "weekly"
+    timeline: list[TimelineEntry]
+    total_duration_seconds: int
+
+
+class BreakdownReportResponse(BaseModel):
+    """Response model for breakdown reports."""
+
+    breakdown_type: str  # "project" or "category"
+    items: list[ProjectBreakdown] | list[CategoryBreakdown]
+    total_duration_seconds: int
+
+
+# ============================================================================
+# Analytics Models
+# ============================================================================
+
+
+class ProductivityMetrics(BaseModel):
+    """Productivity metrics over a period."""
+
+    period: str
+    total_tracked_seconds: int
+    active_seconds: int
+    idle_seconds: int
+    active_percentage: float
+    entries_per_day: float
+    avg_entry_duration_seconds: float
+    most_productive_hour: Optional[int] = None
+    least_productive_hour: Optional[int] = None
+
+
+class TrendData(BaseModel):
+    """Trend data point."""
+
+    date: str
+    value: float
+    label: str
+
+
+class TrendAnalysis(BaseModel):
+    """Trend analysis response."""
+
+    metric: str  # "duration", "entries", "productivity"
+    period: str
+    trend_direction: str  # "increasing", "decreasing", "stable"
+    trend_percentage: float
+    data_points: list[TrendData]
