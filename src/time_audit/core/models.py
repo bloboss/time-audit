@@ -114,15 +114,15 @@ class Entry:
             category=data["category"] if data["category"] else None,
             tags=[t.strip() for t in data["tags"].split(",") if t.strip()],
             notes=data["notes"] if data["notes"] else None,
-            active_process=data["active_process"] if data["active_process"] else None,
-            active_window=data["active_window"] if data["active_window"] else None,
-            idle_time_seconds=int(data["idle_time_seconds"]) if data["idle_time_seconds"] else 0,
+            active_process=data.get("active_process") if data.get("active_process") else None,
+            active_window=data.get("active_window") if data.get("active_window") else None,
+            idle_time_seconds=int(data.get("idle_time_seconds", 0)) if data.get("idle_time_seconds") else 0,
             manual_entry=bool(data.get("manual_entry", False)),
             edited=bool(data.get("edited", False)),
             auto_tracked=bool(data.get("auto_tracked", False)),
-            rule_id=data["rule_id"] if data.get("rule_id") else None,
-            created_at=datetime.fromisoformat(data["created_at"]),
-            updated_at=datetime.fromisoformat(data["updated_at"]),
+            rule_id=data.get("rule_id") if data.get("rule_id") else None,
+            created_at=datetime.fromisoformat(data.get("created_at", datetime.now().isoformat())),
+            updated_at=datetime.fromisoformat(data.get("updated_at", datetime.now().isoformat())),
         )
 
 
