@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from time_audit.analysis.reports import ReportGenerator
 from time_audit.core.storage import StorageManager
 from time_audit.core.tracker import TimeTracker
 
@@ -361,6 +362,102 @@ def cancel(ctx: click.Context) -> None:
         console.print("[yellow]✓[/yellow] Current tracking session cancelled")
     else:
         console.print("[yellow]No task currently being tracked[/yellow]")
+
+
+@cli.command()
+@click.argument("type", type=click.Choice(["summary", "timeline"]), default="summary")
+@click.option("--period", type=click.Choice(["today", "yesterday", "week", "month"]), default="week", help="Time period")
+@click.option("--from", "from_date", help="Start date (YYYY-MM-DD)")
+@click.option("--to", "to_date", help="End date (YYYY-MM-DD)")
+@click.option("-p", "--project", help="Filter by project")
+@click.option("-c", "--category", help="Filter by category")
+@click.pass_context
+def report(
+    ctx: click.Context,
+    type: str,
+    period: str,
+    from_date: Optional[str],
+    to_date: Optional[str],
+    project: Optional[str],
+    category: Optional[str],
+) -> None:
+    """Generate various reports.
+
+    Types:
+        summary  - Summary statistics and breakdowns
+        timeline - Timeline view of activities
+
+    Examples:
+        time-audit report summary --period week
+        time-audit report timeline --period today
+        time-audit report summary --from 2025-11-01 --to 2025-11-30
+    """
+    tracker = get_tracker(ctx.obj.get("data_dir"))
+
+    # Determine date range
+    start_date = None
+    end_date = None
+    period_label = ""
+
+    if from_date or to_date:
+        # Custom date range
+        if from_date:
+            try:
+                start_date = datetime.strptime(from_date, "%Y-%m-%d")
+                period_label = f"From {from_date}"
+            except ValueError:
+                console.print(f"[red]Error:[/red] Invalid date format for --from. Use YYYY-MM-DD")
+                sys.exit(1)
+
+        if to_date:
+            try:
+                end_date = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(days=1)
+                if period_label:
+                    period_label += f" to {to_date}"
+                else:
+                    period_label = f"Up to {to_date}"
+            except ValueError:
+                console.print(f"[red]Error:[/red] Invalid date format for --to. Use YYYY-MM-DD")
+                sys.exit(1)
+    else:
+        # Use period
+        now = datetime.now()
+        if period == "today":
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = start_date + timedelta(days=1)
+            period_label = "Today"
+        elif period == "yesterday":
+            start_date = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = start_date + timedelta(days=1)
+            period_label = "Yesterday"
+        elif period == "week":
+            # Start of week (Monday)
+            days_since_monday = now.weekday()
+            start_date = (now - timedelta(days=days_since_monday)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+            period_label = "This Week"
+        elif period == "month":
+            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+            period_label = "This Month"
+
+    # Get entries
+    entries = tracker.get_entries(
+        project=project,
+        category=category,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    # Generate report
+    report_gen = ReportGenerator(console)
+
+    if type == "summary":
+        report_gen.summary_report(entries, period_label)
+    elif type == "timeline":
+        # For timeline, use today if period is not specified
+        target_date = start_date if start_date else datetime.now()
+        report_gen.timeline_report(entries, target_date)
 
 
 if __name__ == "__main__":
