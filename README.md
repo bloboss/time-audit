@@ -388,11 +388,14 @@ See [DESIGN.md](DESIGN.md) for the complete architectural design and future plan
 - ✅ CI/CD pipeline (GitHub Actions)
 
 ### Phase 2: Enhanced Features (Planned)
+
+**See [PHASE2_PLAN.md](PHASE2_PLAN.md) for detailed implementation plan.**
+
 - 🔲 Process detection (automatic task tracking)
 - 🔲 Idle time detection
 - 🔲 Desktop notifications
 - 🔲 Configuration system
-- 🔲 Export/import (JSON, Excel)
+- 🔲 Export/import (JSON, Excel, iCal, Markdown)
 
 ### Phase 3: Professional Features (Planned)
 - 🔲 REST API
