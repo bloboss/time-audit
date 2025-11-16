@@ -12,6 +12,7 @@ from rich.table import Table
 
 from time_audit.analysis.reports import ReportGenerator
 from time_audit.cli.config_commands import config
+from time_audit.cli.daemon_commands import daemon
 from time_audit.cli.export_import_commands import export_import
 from time_audit.core.storage import StorageManager
 from time_audit.core.tracker import TimeTracker
@@ -465,6 +466,7 @@ def report(
 
 # Register command groups
 cli.add_command(config)
+cli.add_command(daemon)
 cli.add_command(export_import)
 
 
