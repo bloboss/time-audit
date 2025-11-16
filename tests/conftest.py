@@ -1,6 +1,6 @@
 """Pytest configuration and shared fixtures."""
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 
 def pytest_configure(config: pytest.Config) -> None:

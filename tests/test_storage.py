@@ -4,13 +4,13 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.core.models import Category, Entry, Project
 from time_audit.core.storage import StorageManager
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def temp_storage() -> StorageManager:
     """Create a storage manager with temporary directory."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -225,10 +225,7 @@ class TestStorageManager:
         """Test that concurrent writes don't corrupt data."""
         # This is a basic test - full concurrency testing would require
         # multiple processes
-        entries = [
-            Entry(task_name=f"Task {i}", start_time=datetime.now())
-            for i in range(10)
-        ]
+        entries = [Entry(task_name=f"Task {i}", start_time=datetime.now()) for i in range(10)]
 
         # Save multiple entries
         for entry in entries:

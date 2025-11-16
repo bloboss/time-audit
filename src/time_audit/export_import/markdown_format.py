@@ -134,12 +134,8 @@ class MarkdownExporter(Exporter):
         lines = ["## Summary\n"]
 
         # Calculate totals
-        total_duration = sum(
-            e.duration_seconds for e in entries if e.duration_seconds
-        )
-        total_active = sum(
-            e.active_time_seconds for e in entries if e.active_time_seconds
-        )
+        total_duration = sum(e.duration_seconds for e in entries if e.duration_seconds)
+        total_active = sum(e.active_duration_seconds for e in entries if e.active_duration_seconds)
 
         lines.append(f"**Total Time Tracked:** {total_duration / 3600:.2f} hours")
         lines.append(f"**Total Active Time:** {total_active / 3600:.2f} hours\n")
@@ -153,9 +149,7 @@ class MarkdownExporter(Exporter):
 
         if project_time:
             lines.append("### Time by Project\n")
-            for project, hours in sorted(
-                project_time.items(), key=lambda x: x[1], reverse=True
-            ):
+            for project, hours in sorted(project_time.items(), key=lambda x: x[1], reverse=True):
                 lines.append(f"- **{project}:** {hours:.2f} hours")
             lines.append("")
 
@@ -168,9 +162,7 @@ class MarkdownExporter(Exporter):
 
         if category_time:
             lines.append("### Time by Category\n")
-            for category, hours in sorted(
-                category_time.items(), key=lambda x: x[1], reverse=True
-            ):
+            for category, hours in sorted(category_time.items(), key=lambda x: x[1], reverse=True):
                 lines.append(f"- **{category}:** {hours:.2f} hours")
             lines.append("")
 
@@ -216,9 +208,7 @@ class MarkdownExporter(Exporter):
             lines.append(f"### {day_name}\n")
 
             # Day summary
-            day_duration = sum(
-                e.duration_seconds for e in day_entries if e.duration_seconds
-            )
+            day_duration = sum(e.duration_seconds for e in day_entries if e.duration_seconds)
             lines.append(f"**Total:** {day_duration / 3600:.2f} hours\n")
 
             # Entries
@@ -246,13 +236,10 @@ class MarkdownExporter(Exporter):
 
         # Sort by total time
         project_totals = {
-            p: sum(e.duration_seconds or 0 for e in entries)
-            for p, entries in by_project.items()
+            p: sum(e.duration_seconds or 0 for e in entries) for p, entries in by_project.items()
         }
 
-        for project in sorted(
-            by_project.keys(), key=lambda p: project_totals[p], reverse=True
-        ):
+        for project in sorted(by_project.keys(), key=lambda p: project_totals[p], reverse=True):
             project_entries = by_project[project]
 
             # Project header
@@ -290,13 +277,10 @@ class MarkdownExporter(Exporter):
 
         # Sort by total time
         category_totals = {
-            c: sum(e.duration_seconds or 0 for e in entries)
-            for c, entries in by_category.items()
+            c: sum(e.duration_seconds or 0 for e in entries) for c, entries in by_category.items()
         }
 
-        for category in sorted(
-            by_category.keys(), key=lambda c: category_totals[c], reverse=True
-        ):
+        for category in sorted(by_category.keys(), key=lambda c: category_totals[c], reverse=True):
             category_entries = by_category[category]
 
             # Category header
@@ -354,7 +338,11 @@ class MarkdownExporter(Exporter):
             else:
                 duration = "-"
 
-            notes = entry.notes[:30] + "..." if entry.notes and len(entry.notes) > 30 else entry.notes or ""
+            notes = (
+                entry.notes[:30] + "..."
+                if entry.notes and len(entry.notes) > 30
+                else entry.notes or ""
+            )
 
             lines.append(f"{indent}| {task} | {start} | {end} | {duration} | {notes} |")
 

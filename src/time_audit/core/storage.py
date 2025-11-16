@@ -6,7 +6,7 @@ import os
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from time_audit.core.models import Category, Entry, ProcessRule, Project
 
@@ -70,7 +70,16 @@ class StorageManager:
         if not self.projects_file.exists():
             self._write_csv_atomic(
                 self.projects_file,
-                ["id", "name", "description", "client", "hourly_rate", "budget_hours", "active", "created_at"],
+                [
+                    "id",
+                    "name",
+                    "description",
+                    "client",
+                    "hourly_rate",
+                    "budget_hours",
+                    "active",
+                    "created_at",
+                ],
                 [],
             )
 
@@ -100,7 +109,7 @@ class StorageManager:
                 [],
             )
 
-    def _write_csv_atomic(self, file_path: Path, fieldnames: list[str], rows: list[dict]) -> None:
+    def _write_csv_atomic(self, file_path: Path, fieldnames: list[str], rows: list[dict[str, Any]]) -> None:
         """Write CSV file atomically using temporary file and rename.
 
         Args:
@@ -135,7 +144,7 @@ class StorageManager:
                 temp_file.unlink()
             raise e
 
-    def _read_csv(self, file_path: Path) -> list[dict]:
+    def _read_csv(self, file_path: Path) -> list[dict[str, Any]]:
         """Read CSV file with locking.
 
         Args:
@@ -252,12 +261,30 @@ class StorageManager:
             return False
 
         # Get fieldnames from first entry or use defaults
-        fieldnames = list(entries[0].keys()) if entries else [
-            "id", "start_time", "end_time", "duration_seconds", "task_name",
-            "project", "category", "tags", "notes", "active_process",
-            "active_window", "idle_time_seconds", "manual_entry", "edited",
-            "auto_tracked", "rule_id", "created_at", "updated_at"
-        ]
+        fieldnames = (
+            list(entries[0].keys())
+            if entries
+            else [
+                "id",
+                "start_time",
+                "end_time",
+                "duration_seconds",
+                "task_name",
+                "project",
+                "category",
+                "tags",
+                "notes",
+                "active_process",
+                "active_window",
+                "idle_time_seconds",
+                "manual_entry",
+                "edited",
+                "auto_tracked",
+                "rule_id",
+                "created_at",
+                "updated_at",
+            ]
+        )
 
         self._write_csv_atomic(self.entries_file, fieldnames, entries)
         return True
@@ -465,19 +492,23 @@ class StorageManager:
         if len(rules) == original_count:
             return False
 
-        fieldnames = list(rules[0].keys()) if rules else [
-            "id",
-            "pattern",
-            "task_name",
-            "project",
-            "category",
-            "tags",
-            "enabled",
-            "learned",
-            "confidence",
-            "match_count",
-            "created_at",
-        ]
+        fieldnames = (
+            list(rules[0].keys())
+            if rules
+            else [
+                "id",
+                "pattern",
+                "task_name",
+                "project",
+                "category",
+                "tags",
+                "enabled",
+                "learned",
+                "confidence",
+                "match_count",
+                "created_at",
+            ]
+        )
 
         self._write_csv_atomic(self.rules_file, fieldnames, rules)
         return True

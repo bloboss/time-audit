@@ -12,6 +12,13 @@
 - 🏷️ **Tags & Categories** - Organize tasks with projects, categories, and tags
 - 📅 **Flexible Filtering** - Filter by date, project, category
 - 📈 **Analytics** - Track productivity with active/idle time ratios
+- 🤖 **Process Detection** - Automatic task tracking based on active applications
+- ⏸️ **Idle Detection** - Automatically detect and track idle time
+- 🔔 **Desktop Notifications** - Stay informed with system notifications
+- ⚙️ **Smart Automation** - Rule-based task matching and auto-switching
+- 🔧 **Configuration System** - YAML-based configuration with validation
+- 📤 **Export/Import** - Multiple formats (JSON, Excel, iCal, Markdown)
+- 🔄 **Background Daemon** - Cross-platform background service (systemd, launchd, Windows Service)
 
 ## Installation
 
@@ -387,28 +394,34 @@ See [DESIGN.md](DESIGN.md) for the complete architectural design and future plan
 - ✅ Comprehensive test suite (77 tests, 86% coverage)
 - ✅ CI/CD pipeline (GitHub Actions)
 
-### Phase 2: Enhanced Features (Planned)
+### Phase 2: Enhanced Features ✅ **COMPLETE**
 
 **See [PHASE2_PLAN.md](PHASE2_PLAN.md) for detailed implementation plan.**
 
-- 🔲 Process detection (automatic task tracking)
-- 🔲 Idle time detection
-- 🔲 Desktop notifications
-- 🔲 Configuration system
-- 🔲 Export/import (JSON, Excel, iCal, Markdown)
+- ✅ Process detection (automatic task tracking)
+- ✅ Idle time detection
+- ✅ Desktop notifications
+- ✅ Configuration system (YAML-based)
+- ✅ Rule-based automation engine
+- ✅ Export/import (JSON, Excel, iCal, Markdown)
 
-### Phase 3: Professional Features (Planned)
+### Phase 3: Professional Features 🚧 **IN PROGRESS (50%)**
+- ✅ Background daemon (Linux systemd, macOS launchd, Windows Service)
+- ✅ IPC communication (Unix sockets, Windows named pipes)
+- ✅ Daemon state management
+- ✅ Platform-specific service installation
 - 🔲 REST API
-- 🔲 Background daemon
 - 🔲 Goal tracking
 - 🔲 Invoice generation
-- 🔲 Advanced analytics
+- 🔲 Batch operations
+- 🔲 Templates
 
-### Phase 4: Advanced Features (Future)
+### Phase 4: Advanced Features (Planned)
 - 🔲 Web dashboard
 - 🔲 Interactive TUI mode
 - 🔲 Pomodoro timer
 - 🔲 Git integration
+- 🔲 Advanced analytics
 - 🔲 Machine learning insights
 
 ## Contributing

@@ -125,6 +125,4 @@ class Importer(ABC):
 
         expected_ext = self.get_file_extension()
         if self.input_path.suffix.lower() != expected_ext.lower():
-            raise ValueError(
-                f"Expected {expected_ext} file, got {self.input_path.suffix}"
-            )
+            raise ValueError(f"Expected {expected_ext} file, got {self.input_path.suffix}")

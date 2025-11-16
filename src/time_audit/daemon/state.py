@@ -250,9 +250,9 @@ class PIDFileManager:
             return False
 
         try:
-            import psutil
+            import psutil  # type: ignore[import-untyped]
 
-            return psutil.pid_exists(pid)
+            return bool(psutil.pid_exists(pid))
         except ImportError:
             # Fallback: try to send signal 0
             import os

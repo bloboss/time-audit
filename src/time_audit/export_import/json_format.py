@@ -49,7 +49,7 @@ class JSONExporter(Exporter):
 
         # Add metadata if requested
         if kwargs.get("include_metadata", True):
-            export_data["metadata"] = {
+            export_data["metadata"] = {  # type: ignore[assignment]
                 "export_date": datetime.now().isoformat(),
                 "entry_count": len(filtered_entries),
                 "date_range": {

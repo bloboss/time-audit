@@ -4,20 +4,20 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-import pytest
-from click.testing import CliRunner
+import pytest  # type: ignore[import-not-found]
+from click.testing import CliRunner  # type: ignore[import-not-found]
 
 from time_audit.cli.main import cli
 from time_audit.core.storage import StorageManager
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def runner() -> CliRunner:
     """Create CLI test runner."""
     return CliRunner()
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def temp_dir() -> Path:
     """Create temporary directory for tests."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -99,9 +99,7 @@ class TestCLICommands:
         """Test stop command with notes."""
         runner.invoke(cli, ["--data-dir", str(temp_dir), "start", "Test task"])
 
-        result = runner.invoke(
-            cli, ["--data-dir", str(temp_dir), "stop", "-n", "Completed"]
-        )
+        result = runner.invoke(cli, ["--data-dir", str(temp_dir), "stop", "-n", "Completed"])
 
         assert result.exit_code == 0
 
@@ -199,9 +197,7 @@ class TestCLICommands:
             ],
         )
 
-        result = runner.invoke(
-            cli, ["--data-dir", str(temp_dir), "log", "-p", "project-a"]
-        )
+        result = runner.invoke(cli, ["--data-dir", str(temp_dir), "log", "-p", "project-a"])
 
         assert result.exit_code == 0
         assert "Task 1" in result.output

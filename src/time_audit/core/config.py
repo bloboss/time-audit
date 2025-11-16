@@ -4,8 +4,8 @@ import copy
 from pathlib import Path
 from typing import Any, Optional
 
-import yaml
-from jsonschema import ValidationError, validate
+import yaml  # type: ignore[import-untyped]
+from jsonschema import ValidationError, validate  # type: ignore[import-untyped]
 
 
 class ConfigManager:
@@ -174,7 +174,7 @@ class ConfigManager:
             self._config = copy.deepcopy(self.DEFAULT_CONFIG)
             self.save()
 
-    def _merge_with_defaults(self, config: dict) -> dict:
+    def _merge_with_defaults(self, config: dict[str, Any]) -> dict[str, Any]:
         """Merge config with defaults to ensure all keys exist.
 
         Args:
@@ -187,7 +187,7 @@ class ConfigManager:
         self._deep_merge(result, config)
         return result
 
-    def _deep_merge(self, base: dict, override: dict) -> None:
+    def _deep_merge(self, base: dict[str, Any], override: dict[str, Any]) -> None:
         """Deep merge override into base dictionary (in-place).
 
         Args:
@@ -278,7 +278,7 @@ class ConfigManager:
         self._config = copy.deepcopy(self.DEFAULT_CONFIG)
         self.save()
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Get full configuration as dictionary.
 
         Returns:

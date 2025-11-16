@@ -29,7 +29,7 @@ StandardError=journal
 WantedBy=default.target
 """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize systemd service manager."""
         self.systemd_dir = Path.home() / ".config" / "systemd" / "user"
         self.unit_file = self.systemd_dir / f"{self.SERVICE_NAME}.service"

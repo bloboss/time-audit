@@ -29,6 +29,19 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
+        pip install types-PyYAML types-jsonschema types-psutil types-python-dateutil
+
+    - name: Install platform-specific dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        pip install pywin32
+      continue-on-error: true
+
+    - name: Install platform-specific dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        pip install pyobjc-framework-Cocoa pyobjc-framework-Quartz
+      continue-on-error: true
 
     - name: Lint with ruff
       run: |
@@ -43,6 +56,11 @@ jobs:
     - name: Run tests with pytest
       run: |
         pytest tests/ -v --cov=time_audit --cov-report=xml --cov-report=term
+
+    - name: Run daemon tests
+      run: |
+        pytest tests/daemon/ -v
+      continue-on-error: false
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
@@ -70,6 +88,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
+        pip install types-PyYAML types-jsonschema types-psutil types-python-dateutil
 
     - name: Check code formatting with black
       run: |

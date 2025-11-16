@@ -42,7 +42,7 @@ class LaunchdService:
 </plist>
 """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize launchd service manager."""
         self.launch_agents_dir = Path.home() / "Library" / "LaunchAgents"
         self.plist_file = self.launch_agents_dir / f"{self.SERVICE_NAME}.plist"

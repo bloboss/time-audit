@@ -5,7 +5,7 @@ import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.core.models import Entry
 from time_audit.export_import import JSONExporter, JSONImporter
@@ -160,6 +160,7 @@ class TestJSONImporter:
     def test_import_entries(self, tmp_path: Path) -> None:
         """Test importing entries from JSON."""
         import uuid
+
         input_file = tmp_path / "import.json"
 
         # Create test JSON file
@@ -213,6 +214,7 @@ class TestJSONImporter:
     def test_import_from_array_format(self, tmp_path: Path) -> None:
         """Test importing from direct array format."""
         import uuid
+
         input_file = tmp_path / "import.json"
 
         # Create test JSON file with array format
@@ -275,6 +277,7 @@ class TestJSONImporter:
     def test_import_skip_invalid_entries(self, tmp_path: Path) -> None:
         """Test import raises error for invalid entries with validation enabled."""
         import uuid
+
         input_file = tmp_path / "import.json"
 
         # Mix of valid and invalid entries

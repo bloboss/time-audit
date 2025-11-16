@@ -2,7 +2,7 @@
 
 from unittest.mock import Mock, patch
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.automation.idle_detector import IdleDetector
 
@@ -23,9 +23,7 @@ class TestIdleDetector:
         on_idle = Mock()
         on_active = Mock()
 
-        detector = IdleDetector(
-            threshold=300, on_idle=on_idle, on_active=on_active
-        )
+        detector = IdleDetector(threshold=300, on_idle=on_idle, on_active=on_active)
 
         assert detector.on_idle == on_idle
         assert detector.on_active == on_active

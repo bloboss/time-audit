@@ -16,7 +16,7 @@ class WindowsService:
     SERVICE_DISPLAY_NAME = "Time Audit Daemon"
     SERVICE_DESCRIPTION = "Background time tracking service for Time Audit"
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize Windows service manager."""
         self._check_pywin32()
 
@@ -27,11 +27,10 @@ class WindowsService:
             ImportError: If pywin32 is not installed
         """
         try:
-            import win32serviceutil  # noqa: F401
+            import win32serviceutil  # type: ignore[import-untyped]  # noqa: F401
         except ImportError:
             raise ImportError(
-                "Windows service support requires pywin32. "
-                "Install with: pip install pywin32"
+                "Windows service support requires pywin32. " "Install with: pip install pywin32"
             )
 
     def install(self) -> Tuple[bool, str]:
@@ -43,10 +42,10 @@ class WindowsService:
         try:
             import sys
 
-            import win32serviceutil
+            import win32serviceutil  # type: ignore[import-untyped]
 
             # Service class is defined separately (see service_impl.py)
-            from time_audit.daemon.windows_service_impl import TimeAuditWindowsService
+            from time_audit.daemon.windows_service_impl import TimeAuditWindowsService  # type: ignore[import-not-found]
 
             # Install service
             win32serviceutil.InstallService(
@@ -71,7 +70,7 @@ class WindowsService:
             Tuple of (success, message)
         """
         try:
-            import win32serviceutil
+            import win32serviceutil  # type: ignore[import-untyped]
 
             # Stop service first
             self.stop()
@@ -93,7 +92,7 @@ class WindowsService:
             Tuple of (success, message)
         """
         try:
-            import win32serviceutil
+            import win32serviceutil  # type: ignore[import-untyped]
 
             win32serviceutil.StartService(self.SERVICE_NAME)
 
@@ -109,7 +108,7 @@ class WindowsService:
             Tuple of (success, message)
         """
         try:
-            import win32serviceutil
+            import win32serviceutil  # type: ignore[import-untyped]
 
             win32serviceutil.StopService(self.SERVICE_NAME)
 
@@ -128,7 +127,7 @@ class WindowsService:
             Tuple of (success, message)
         """
         try:
-            import win32serviceutil
+            import win32serviceutil  # type: ignore[import-untyped]
 
             win32serviceutil.RestartService(self.SERVICE_NAME)
 
@@ -144,8 +143,8 @@ class WindowsService:
             Tuple of (is_running, status_message)
         """
         try:
-            import win32service
-            import win32serviceutil
+            import win32service  # type: ignore[import-untyped]
+            import win32serviceutil  # type: ignore[import-untyped]
 
             status = win32serviceutil.QueryServiceStatus(self.SERVICE_NAME)[1]
 
@@ -177,14 +176,14 @@ class WindowsService:
             Log output
         """
         try:
-            import win32evtlog
+            import win32evtlog  # type: ignore[import-untyped]
 
             # Open event log
             hand = win32evtlog.OpenEventLog(None, "Application")
 
             # Read events
             flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
-            events = []
+            events: list[object] = []
 
             while len(events) < lines:
                 event_batch = win32evtlog.ReadEventLog(hand, flags, 0)
@@ -201,8 +200,8 @@ class WindowsService:
             # Format events
             log_lines = []
             for event in events:
-                timestamp = event.TimeGenerated.Format()
-                message = event.StringInserts[0] if event.StringInserts else ""
+                timestamp = event.TimeGenerated.Format()  # type: ignore[attr-defined]
+                message = event.StringInserts[0] if event.StringInserts else ""  # type: ignore[attr-defined]
                 log_lines.append(f"{timestamp}: {message}")
 
             return "\n".join(log_lines) if log_lines else "No logs available"

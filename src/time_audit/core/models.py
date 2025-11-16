@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Any, Optional
 from uuid import UUID, uuid4
 
 
@@ -79,7 +79,7 @@ class Entry:
         """Check if this entry is currently running."""
         return self.end_time is None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for CSV/JSON serialization."""
         return {
             "id": str(self.id),
@@ -103,7 +103,7 @@ class Entry:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Entry":
+    def from_dict(cls, data: dict[str, Any]) -> "Entry":
         """Create Entry from dictionary (CSV/JSON deserialization)."""
         return cls(
             id=UUID(data["id"]),
@@ -150,7 +150,7 @@ class Project:
     active: bool = True
     created_at: datetime = field(default_factory=datetime.now)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for CSV/JSON serialization."""
         return {
             "id": self.id,
@@ -164,7 +164,7 @@ class Project:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Project":
+    def from_dict(cls, data: dict[str, Any]) -> "Project":
         """Create Project from dictionary (CSV/JSON deserialization)."""
         return cls(
             id=data["id"],
@@ -196,7 +196,7 @@ class Category:
     parent_category: Optional[str] = None
     billable: bool = True
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for CSV/JSON serialization."""
         return {
             "id": self.id,
@@ -207,7 +207,7 @@ class Category:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Category":
+    def from_dict(cls, data: dict[str, Any]) -> "Category":
         """Create Category from dictionary (CSV/JSON deserialization)."""
         return cls(
             id=data["id"],
@@ -265,7 +265,7 @@ class ProcessRule:
             # Invalid regex pattern
             return False
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for CSV/JSON serialization."""
         return {
             "id": self.id,
@@ -282,7 +282,7 @@ class ProcessRule:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ProcessRule":
+    def from_dict(cls, data: dict[str, Any]) -> "ProcessRule":
         """Create ProcessRule from dictionary (CSV/JSON deserialization)."""
         return cls(
             id=data["id"],

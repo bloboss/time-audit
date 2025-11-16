@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.core.models import Category, Entry, Project
 

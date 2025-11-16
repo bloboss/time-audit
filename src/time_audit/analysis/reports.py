@@ -4,9 +4,9 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Optional
 
-from rich.console import Console
-from rich.table import Table
-from rich.text import Text
+from rich.console import Console  # type: ignore[import-not-found]
+from rich.table import Table  # type: ignore[import-not-found]
+from rich.text import Text  # type: ignore[import-not-found]
 
 from time_audit.core.models import Entry
 
@@ -45,13 +45,13 @@ class ReportGenerator:
         num_tasks = len(set(e.task_name for e in entries))
 
         # Group by project
-        by_project = defaultdict(int)
+        by_project = defaultdict(int)  # type: ignore[var-annotated]
         for entry in entries:
             if entry.duration_seconds:
                 by_project[entry.project or "(no project)"] += entry.duration_seconds
 
         # Group by category
-        by_category = defaultdict(int)
+        by_category = defaultdict(int)  # type: ignore[var-annotated]
         for entry in entries:
             if entry.duration_seconds:
                 by_category[entry.category or "(no category)"] += entry.duration_seconds
@@ -124,7 +124,7 @@ class ReportGenerator:
             self.console.print()
 
         # Top tasks
-        task_durations = defaultdict(int)
+        task_durations = defaultdict(int)  # type: ignore[var-annotated]
         for entry in entries:
             if entry.duration_seconds:
                 task_durations[entry.task_name] += entry.duration_seconds
@@ -159,15 +159,12 @@ class ReportGenerator:
             date: Date for the timeline. Defaults to today.
         """
         if date is None:
-            date = datetime.now().date()
+            date = datetime.now().date()  # type: ignore[assignment]
         else:
-            date = date.date()
+            date = date.date()  # type: ignore[assignment]
 
         # Filter entries for the specified date
-        day_entries = [
-            e for e in entries
-            if e.start_time.date() == date
-        ]
+        day_entries = [e for e in entries if e.start_time.date() == date]
 
         if not day_entries:
             self.console.print(f"[yellow]No entries found for {date}[/yellow]")

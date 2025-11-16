@@ -5,10 +5,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-import click
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
+import click  # type: ignore[import-not-found]
+from rich.console import Console  # type: ignore[import-not-found]
+from rich.panel import Panel  # type: ignore[import-not-found]
+from rich.table import Table  # type: ignore[import-not-found]
 
 from time_audit.analysis.reports import ReportGenerator
 from time_audit.cli.config_commands import config
@@ -49,11 +49,11 @@ def format_datetime(dt: datetime) -> str:
     return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
-@click.group()
-@click.version_option(version="0.2.0-dev")
-@click.option("--data-dir", help="Custom data directory", type=click.Path())
-@click.option("--no-color", is_flag=True, help="Disable colored output")
-@click.pass_context
+@click.group()  # type: ignore[misc]
+@click.version_option(version="0.2.0-dev")  # type: ignore[misc]
+@click.option("--data-dir", help="Custom data directory", type=click.Path())  # type: ignore[misc]
+@click.option("--no-color", is_flag=True, help="Disable colored output")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def cli(ctx: click.Context, data_dir: Optional[str], no_color: bool) -> None:
     """Time Audit - Command-line time tracking application.
 
@@ -66,13 +66,13 @@ def cli(ctx: click.Context, data_dir: Optional[str], no_color: bool) -> None:
         console.no_color = True
 
 
-@cli.command()
-@click.argument("task_name")
-@click.option("-p", "--project", help="Project identifier")
-@click.option("-c", "--category", help="Category identifier")
-@click.option("-t", "--tags", help="Comma-separated tags")
-@click.option("-n", "--notes", help="Additional notes")
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.argument("task_name")  # type: ignore[misc]
+@click.option("-p", "--project", help="Project identifier")  # type: ignore[misc]
+@click.option("-c", "--category", help="Category identifier")  # type: ignore[misc]
+@click.option("-t", "--tags", help="Comma-separated tags")  # type: ignore[misc]
+@click.option("-n", "--notes", help="Additional notes")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def start(
     ctx: click.Context,
     task_name: str,
@@ -104,9 +104,9 @@ def start(
         sys.exit(1)
 
 
-@cli.command()
-@click.option("-n", "--notes", help="Add notes to the completed entry")
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.option("-n", "--notes", help="Add notes to the completed entry")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def stop(ctx: click.Context, notes: Optional[str]) -> None:
     """Stop the currently running entry.
 
@@ -122,20 +122,20 @@ def stop(ctx: click.Context, notes: Optional[str]) -> None:
         console.print(f"[green]✓[/green] Stopped tracking: {entry.task_name}")
         console.print(f"  Duration: {format_duration(entry.duration_seconds)}")
         if entry.project:
-            console.print(f"  Project: {entry.project}")
+            console.print(f"  Project: {entry.project}") # type: ignore[union-attr]
 
     except ValueError as e:
         error_console.print(f"[red]Error:[/red] {e}")
         sys.exit(1)
 
 
-@cli.command()
-@click.argument("task_name")
-@click.option("-p", "--project", help="Project identifier")
-@click.option("-c", "--category", help="Category identifier")
-@click.option("-t", "--tags", help="Comma-separated tags")
-@click.option("-n", "--notes", help="Additional notes")
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.argument("task_name")  # type: ignore[misc]
+@click.option("-p", "--project", help="Project identifier")  # type: ignore[misc]
+@click.option("-c", "--category", help="Category identifier")  # type: ignore[misc]
+@click.option("-t", "--tags", help="Comma-separated tags")  # type: ignore[misc]
+@click.option("-n", "--notes", help="Additional notes")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def switch(
     ctx: click.Context,
     task_name: str,
@@ -155,16 +155,18 @@ def switch(
     stopped, new_entry = tracker.switch(task_name, project, category, tag_list, notes)
 
     if stopped:
-        console.print(f"[yellow]⏹[/yellow]  Stopped: {stopped.task_name} ({format_duration(stopped.duration_seconds)})")
+        console.print(
+            f"[yellow]⏹[/yellow]  Stopped: {stopped.task_name} ({format_duration(stopped.duration_seconds)})"
+        )
 
     console.print(f"[green]▶[/green]  Started: {task_name}")
     if project:
         console.print(f"  Project: {project}")
 
 
-@cli.command()
-@click.option("-v", "--verbose", is_flag=True, help="Show detailed information")
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.option("-v", "--verbose", is_flag=True, help="Show detailed information")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def status(ctx: click.Context, verbose: bool) -> None:
     """Show current tracking status.
 
@@ -177,7 +179,7 @@ def status(ctx: click.Context, verbose: bool) -> None:
 
     if not entry:
         console.print("[yellow]No task currently being tracked[/yellow]")
-        console.print("\nStart tracking with: [cyan]time-audit start \"Task name\"[/cyan]")
+        console.print('\nStart tracking with: [cyan]time-audit start "Task name"[/cyan]')
         return
 
     # Calculate current duration
@@ -207,13 +209,13 @@ def status(ctx: click.Context, verbose: bool) -> None:
     console.print(panel)
 
 
-@cli.command()
-@click.option("-n", "--count", default=10, help="Number of entries to show")
-@click.option("-d", "--date", help="Filter by date (YYYY-MM-DD or 'today', 'yesterday')")
-@click.option("-p", "--project", help="Filter by project")
-@click.option("-c", "--category", help="Filter by category")
-@click.option("--json", "as_json", is_flag=True, help="Output as JSON")
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.option("-n", "--count", default=10, help="Number of entries to show")  # type: ignore[misc]
+@click.option("-d", "--date", help="Filter by date (YYYY-MM-DD or 'today', 'yesterday')")  # type: ignore[misc]
+@click.option("-p", "--project", help="Filter by project")  # type: ignore[misc]
+@click.option("-c", "--category", help="Filter by category")  # type: ignore[misc]
+@click.option("--json", "as_json", is_flag=True, help="Output as JSON")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def log(
     ctx: click.Context,
     count: int,
@@ -240,7 +242,9 @@ def log(
             start_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = start_date + timedelta(days=1)
         elif date.lower() == "yesterday":
-            start_date = (datetime.now() - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            start_date = (datetime.now() - timedelta(days=1)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
             end_date = start_date + timedelta(days=1)
         else:
             try:
@@ -248,7 +252,9 @@ def log(
                 start_date = parsed_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 end_date = start_date + timedelta(days=1)
             except ValueError:
-                console.print(f"[red]Error:[/red] Invalid date format. Use YYYY-MM-DD, 'today', or 'yesterday'")
+                console.print(
+                    f"[red]Error:[/red] Invalid date format. Use YYYY-MM-DD, 'today', or 'yesterday'"
+                )
                 sys.exit(1)
 
     entries = tracker.get_entries(
@@ -265,6 +271,7 @@ def log(
 
     if as_json:
         import json
+
         data = [entry.to_dict() for entry in entries]
         print(json.dumps(data, indent=2))
         return
@@ -292,15 +299,15 @@ def log(
     console.print(table)
 
 
-@cli.command()
-@click.argument("task_name")
-@click.option("--start", required=True, help="Start time (YYYY-MM-DD HH:MM or HH:MM for today)")
-@click.option("--end", required=True, help="End time (YYYY-MM-DD HH:MM or HH:MM for today)")
-@click.option("-p", "--project", help="Project identifier")
-@click.option("-c", "--category", help="Category identifier")
-@click.option("-t", "--tags", help="Comma-separated tags")
-@click.option("-n", "--notes", help="Additional notes")
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.argument("task_name")  # type: ignore[misc]
+@click.option("--start", required=True, help="Start time (YYYY-MM-DD HH:MM or HH:MM for today)")  # type: ignore[misc]
+@click.option("--end", required=True, help="End time (YYYY-MM-DD HH:MM or HH:MM for today)")  # type: ignore[misc]
+@click.option("-p", "--project", help="Project identifier")  # type: ignore[misc]
+@click.option("-c", "--category", help="Category identifier")  # type: ignore[misc]
+@click.option("-t", "--tags", help="Comma-separated tags")  # type: ignore[misc]
+@click.option("-n", "--notes", help="Additional notes")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def add(
     ctx: click.Context,
     task_name: str,
@@ -352,8 +359,8 @@ def add(
         sys.exit(1)
 
 
-@cli.command()
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def cancel(ctx: click.Context) -> None:
     """Cancel the current tracking session without saving.
 
@@ -368,14 +375,19 @@ def cancel(ctx: click.Context) -> None:
         console.print("[yellow]No task currently being tracked[/yellow]")
 
 
-@cli.command()
-@click.argument("type", type=click.Choice(["summary", "timeline"]), default="summary")
-@click.option("--period", type=click.Choice(["today", "yesterday", "week", "month"]), default="week", help="Time period")
-@click.option("--from", "from_date", help="Start date (YYYY-MM-DD)")
-@click.option("--to", "to_date", help="End date (YYYY-MM-DD)")
-@click.option("-p", "--project", help="Filter by project")
-@click.option("-c", "--category", help="Filter by category")
-@click.pass_context
+@cli.command()  # type: ignore[misc]
+@click.argument("type", type=click.Choice(["summary", "timeline"]), default="summary")  # type: ignore[misc]
+@click.option(  # type: ignore[misc]
+    "--period",
+    type=click.Choice(["today", "yesterday", "week", "month"]),
+    default="week",
+    help="Time period",
+)
+@click.option("--from", "from_date", help="Start date (YYYY-MM-DD)")  # type: ignore[misc]
+@click.option("--to", "to_date", help="End date (YYYY-MM-DD)")  # type: ignore[misc]
+@click.option("-p", "--project", help="Filter by project")  # type: ignore[misc]
+@click.option("-c", "--category", help="Filter by category")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def report(
     ctx: click.Context,
     type: str,
@@ -431,13 +443,17 @@ def report(
             end_date = start_date + timedelta(days=1)
             period_label = "Today"
         elif period == "yesterday":
-            start_date = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            start_date = (now - timedelta(days=1)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
             end_date = start_date + timedelta(days=1)
             period_label = "Yesterday"
         elif period == "week":
             # Start of week (Monday)
             days_since_monday = now.weekday()
-            start_date = (now - timedelta(days=days_since_monday)).replace(hour=0, minute=0, second=0, microsecond=0)
+            start_date = (now - timedelta(days=days_since_monday)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
             end_date = now
             period_label = "This Week"
         elif period == "month":

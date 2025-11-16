@@ -3,7 +3,7 @@
 import platform
 from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.daemon.platform import (
     Platform,
@@ -18,13 +18,13 @@ from time_audit.daemon.platform import (
 class TestPlatformDetection:
     """Test platform detection."""
 
-    def test_get_platform(self):
+    def test_get_platform(self) -> None:
         """Test platform detection returns valid platform."""
         plat = get_platform()
         assert isinstance(plat, Platform)
         assert plat in (Platform.LINUX, Platform.MACOS, Platform.WINDOWS, Platform.UNKNOWN)
 
-    def test_get_platform_matches_system(self):
+    def test_get_platform_matches_system(self) -> None:
         """Test platform detection matches system platform."""
         plat = get_platform()
         system = platform.system().lower()
@@ -40,12 +40,12 @@ class TestPlatformDetection:
 class TestPaths:
     """Test path utilities."""
 
-    def test_get_ipc_socket_path_returns_path(self):
+    def test_get_ipc_socket_path_returns_path(self) -> None:
         """Test IPC socket path returns Path object."""
         path = get_ipc_socket_path()
         assert isinstance(path, Path)
 
-    def test_get_ipc_socket_path_platform_specific(self):
+    def test_get_ipc_socket_path_platform_specific(self) -> None:
         """Test IPC socket path is platform-appropriate."""
         path = get_ipc_socket_path()
         plat = get_platform()
@@ -57,14 +57,14 @@ class TestPaths:
             # Named pipe
             assert str(path).startswith("\\\\.\\pipe\\")
 
-    def test_get_pid_file_path(self):
+    def test_get_pid_file_path(self) -> None:
         """Test PID file path returns valid Path."""
         path = get_pid_file_path()
         assert isinstance(path, Path)
         assert path.suffix == ".pid"
         assert "time-audit" in str(path)
 
-    def test_get_log_file_path(self):
+    def test_get_log_file_path(self) -> None:
         """Test log file path returns valid Path."""
         path = get_log_file_path()
         assert isinstance(path, Path)
@@ -75,7 +75,7 @@ class TestPaths:
 class TestDaemonSupport:
     """Test daemon support detection."""
 
-    def test_is_daemon_supported_returns_tuple(self):
+    def test_is_daemon_supported_returns_tuple(self) -> None:
         """Test daemon support check returns (bool, str) tuple."""
         result = is_daemon_supported()
         assert isinstance(result, tuple)
@@ -83,7 +83,7 @@ class TestDaemonSupport:
         assert isinstance(result[0], bool)
         assert isinstance(result[1], str)
 
-    def test_is_daemon_supported_on_supported_platforms(self):
+    def test_is_daemon_supported_on_supported_platforms(self) -> None:
         """Test daemon support on known platforms."""
         plat = get_platform()
 
@@ -92,7 +92,7 @@ class TestDaemonSupport:
             supported, reason = is_daemon_supported()
             assert supported is True
 
-    def test_is_daemon_supported_unsupported_platform(self):
+    def test_is_daemon_supported_unsupported_platform(self) -> None:
         """Test daemon support returns False for unknown platform."""
         # Mock unknown platform
         import time_audit.daemon.platform as platform_module

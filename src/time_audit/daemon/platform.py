@@ -101,7 +101,7 @@ def is_daemon_supported() -> Tuple[bool, str]:
     # Check for required modules
     if plat == Platform.WINDOWS:
         try:
-            import win32api  # noqa: F401
+            import win32api  # type: ignore[import-untyped]  # noqa: F401
         except ImportError:
             return (
                 False,

@@ -4,13 +4,13 @@ import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.core.storage import StorageManager
 from time_audit.core.tracker import TimeTracker
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def tracker() -> TimeTracker:
     """Create a time tracker with temporary storage."""
     with tempfile.TemporaryDirectory() as tmpdir:

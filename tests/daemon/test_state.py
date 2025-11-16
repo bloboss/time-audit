@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.daemon.state import DaemonState, PIDFileManager, StateManager
 
@@ -11,7 +11,7 @@ from time_audit.daemon.state import DaemonState, PIDFileManager, StateManager
 class TestDaemonState:
     """Test DaemonState dataclass."""
 
-    def test_create_daemon_state(self):
+    def test_create_daemon_state(self) -> None:
         """Test creating daemon state."""
         state = DaemonState(
             started_at="2025-11-16T10:00:00",
@@ -24,7 +24,7 @@ class TestDaemonState:
         assert state.tracking is False
         assert state.current_entry_id is None
 
-    def test_daemon_state_to_dict(self):
+    def test_daemon_state_to_dict(self) -> None:
         """Test converting state to dictionary."""
         state = DaemonState(
             started_at="2025-11-16T10:00:00",
@@ -37,7 +37,7 @@ class TestDaemonState:
         assert state_dict["pid"] == 12345
         assert state_dict["version"] == "0.3.0"
 
-    def test_daemon_state_from_dict(self):
+    def test_daemon_state_from_dict(self) -> None:
         """Test creating state from dictionary."""
         data = {
             "started_at": "2025-11-16T10:00:00",
@@ -68,7 +68,7 @@ class TestDaemonState:
 class TestStateManager:
     """Test StateManager."""
 
-    def test_initialize_state(self, tmp_path):
+    def test_initialize_state(self, tmp_path) -> None:
         """Test initializing daemon state."""
         state_file = tmp_path / "daemon.json"
         manager = StateManager(state_file)
@@ -79,7 +79,7 @@ class TestStateManager:
         assert state.pid == 12345
         assert state.version == "0.3.0"
 
-    def test_save_and_load_state(self, tmp_path):
+    def test_save_and_load_state(self, tmp_path) -> None:
         """Test saving and loading state."""
         state_file = tmp_path / "daemon.json"
         manager = StateManager(state_file)
@@ -96,7 +96,7 @@ class TestStateManager:
         assert loaded_state.pid == 12345
         assert loaded_state.version == state.version
 
-    def test_update_state(self, tmp_path):
+    def test_update_state(self, tmp_path) -> None:
         """Test updating state fields."""
         state_file = tmp_path / "daemon.json"
         manager = StateManager(state_file)
@@ -116,7 +116,7 @@ class TestStateManager:
         assert state.current_task_name == "Test Task"
         assert state.process_checks_count == 10
 
-    def test_get_dict(self, tmp_path):
+    def test_get_dict(self, tmp_path) -> None:
         """Test getting state as dictionary."""
         state_file = tmp_path / "daemon.json"
         manager = StateManager(state_file)
@@ -127,7 +127,7 @@ class TestStateManager:
         assert isinstance(state_dict, dict)
         assert state_dict["pid"] == 12345
 
-    def test_clear_state(self, tmp_path):
+    def test_clear_state(self, tmp_path) -> None:
         """Test clearing state."""
         state_file = tmp_path / "daemon.json"
         manager = StateManager(state_file)
@@ -139,7 +139,7 @@ class TestStateManager:
         assert not state_file.exists()
         assert manager.get() is None
 
-    def test_load_nonexistent_state(self, tmp_path):
+    def test_load_nonexistent_state(self, tmp_path) -> None:
         """Test loading state when file doesn't exist."""
         state_file = tmp_path / "nonexistent.json"
         manager = StateManager(state_file)
@@ -147,7 +147,7 @@ class TestStateManager:
         state = manager.load()
         assert state is None
 
-    def test_state_persistence_across_instances(self, tmp_path):
+    def test_state_persistence_across_instances(self, tmp_path) -> None:
         """Test state persists across manager instances."""
         state_file = tmp_path / "daemon.json"
 
@@ -167,7 +167,7 @@ class TestStateManager:
 class TestPIDFileManager:
     """Test PIDFileManager."""
 
-    def test_write_and_read_pid(self, tmp_path):
+    def test_write_and_read_pid(self, tmp_path) -> None:
         """Test writing and reading PID."""
         pid_file = tmp_path / "daemon.pid"
         manager = PIDFileManager(pid_file)
@@ -177,7 +177,7 @@ class TestPIDFileManager:
 
         assert pid == 12345
 
-    def test_read_nonexistent_pid(self, tmp_path):
+    def test_read_nonexistent_pid(self, tmp_path) -> None:
         """Test reading PID when file doesn't exist."""
         pid_file = tmp_path / "nonexistent.pid"
         manager = PIDFileManager(pid_file)
@@ -185,7 +185,7 @@ class TestPIDFileManager:
         pid = manager.read()
         assert pid is None
 
-    def test_read_invalid_pid(self, tmp_path):
+    def test_read_invalid_pid(self, tmp_path) -> None:
         """Test reading invalid PID file."""
         pid_file = tmp_path / "daemon.pid"
         manager = PIDFileManager(pid_file)
@@ -197,7 +197,7 @@ class TestPIDFileManager:
         pid = manager.read()
         assert pid is None
 
-    def test_remove_pid_file(self, tmp_path):
+    def test_remove_pid_file(self, tmp_path) -> None:
         """Test removing PID file."""
         pid_file = tmp_path / "daemon.pid"
         manager = PIDFileManager(pid_file)
@@ -208,14 +208,14 @@ class TestPIDFileManager:
         manager.remove()
         assert not pid_file.exists()
 
-    def test_remove_nonexistent_pid_file(self, tmp_path):
+    def test_remove_nonexistent_pid_file(self, tmp_path) -> None:
         """Test removing non-existent PID file doesn't error."""
         pid_file = tmp_path / "nonexistent.pid"
         manager = PIDFileManager(pid_file)
 
         manager.remove()  # Should not raise
 
-    def test_is_running_with_existing_process(self, tmp_path):
+    def test_is_running_with_existing_process(self, tmp_path) -> None:
         """Test is_running with current process."""
         import os
 
@@ -229,7 +229,7 @@ class TestPIDFileManager:
         # Should detect as running
         assert manager.is_running() is True
 
-    def test_is_running_with_nonexistent_pid_file(self, tmp_path):
+    def test_is_running_with_nonexistent_pid_file(self, tmp_path) -> None:
         """Test is_running with no PID file."""
         pid_file = tmp_path / "nonexistent.pid"
         manager = PIDFileManager(pid_file)

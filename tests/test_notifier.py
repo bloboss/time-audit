@@ -2,7 +2,7 @@
 
 from unittest.mock import Mock, patch
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.automation.notifier import Notifier, NotificationType
 

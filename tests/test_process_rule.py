@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.core.models import ProcessRule
 
