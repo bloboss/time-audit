@@ -42,6 +42,8 @@ class Entry:
     idle_time_seconds: int = 0
     manual_entry: bool = False
     edited: bool = False
+    auto_tracked: bool = False  # Phase 2: Was this auto-detected?
+    rule_id: Optional[str] = None  # Phase 2: Rule that triggered auto-tracking
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
 
@@ -60,6 +62,17 @@ class Entry:
         if total is None:
             return None
         return max(0, total - self.idle_time_seconds)
+
+    @property
+    def idle_percentage(self) -> Optional[float]:
+        """Calculate percentage of time that was idle.
+
+        Returns:
+            Percentage (0-100) or None if entry is ongoing
+        """
+        if self.duration_seconds is None or self.duration_seconds == 0:
+            return None
+        return (self.idle_time_seconds / self.duration_seconds) * 100
 
     @property
     def is_running(self) -> bool:
@@ -83,6 +96,8 @@ class Entry:
             "idle_time_seconds": self.idle_time_seconds,
             "manual_entry": self.manual_entry,
             "edited": self.edited,
+            "auto_tracked": self.auto_tracked,
+            "rule_id": self.rule_id or "",
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }
@@ -104,6 +119,8 @@ class Entry:
             idle_time_seconds=int(data["idle_time_seconds"]) if data["idle_time_seconds"] else 0,
             manual_entry=bool(data.get("manual_entry", False)),
             edited=bool(data.get("edited", False)),
+            auto_tracked=bool(data.get("auto_tracked", False)),
+            rule_id=data["rule_id"] if data.get("rule_id") else None,
             created_at=datetime.fromisoformat(data["created_at"]),
             updated_at=datetime.fromisoformat(data["updated_at"]),
         )

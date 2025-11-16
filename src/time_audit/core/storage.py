@@ -58,6 +58,8 @@ class StorageManager:
                     "idle_time_seconds",
                     "manual_entry",
                     "edited",
+                    "auto_tracked",
+                    "rule_id",
                     "created_at",
                     "updated_at",
                 ],
@@ -234,7 +236,7 @@ class StorageManager:
             "id", "start_time", "end_time", "duration_seconds", "task_name",
             "project", "category", "tags", "notes", "active_process",
             "active_window", "idle_time_seconds", "manual_entry", "edited",
-            "created_at", "updated_at"
+            "auto_tracked", "rule_id", "created_at", "updated_at"
         ]
 
         self._write_csv_atomic(self.entries_file, fieldnames, entries)
