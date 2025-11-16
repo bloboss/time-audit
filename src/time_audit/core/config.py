@@ -1,6 +1,7 @@
 """Configuration management for Time Audit."""
 
 import copy
+import secrets
 from pathlib import Path
 from typing import Any, Optional
 
@@ -61,6 +62,35 @@ class ConfigManager:
             "backup_retention_days": 30,
             "log_level": "INFO",
             "performance_mode": False,
+        },
+        "api": {
+            "enabled": False,
+            "host": "localhost",
+            "port": 8000,
+            "workers": 1,
+            "authentication": {
+                "enabled": True,
+                "token_expiry_hours": 24,
+                "secret_key": None,
+            },
+            "cors": {
+                "enabled": True,
+                "origins": ["http://localhost:3000", "http://localhost:5173"],
+            },
+            "rate_limiting": {
+                "enabled": True,
+                "requests_per_minute": 60,
+            },
+            "ssl": {
+                "enabled": False,
+                "cert_file": None,
+                "key_file": None,
+            },
+            "advanced": {
+                "reload": False,
+                "log_level": "info",
+                "access_log": True,
+            },
         },
     }
 
@@ -133,6 +163,64 @@ class ConfigManager:
                         "enum": ["DEBUG", "INFO", "WARNING", "ERROR"],
                     },
                     "performance_mode": {"type": "boolean"},
+                },
+            },
+            "api": {
+                "type": "object",
+                "properties": {
+                    "enabled": {"type": "boolean"},
+                    "host": {"type": "string"},
+                    "port": {"type": "integer", "minimum": 1, "maximum": 65535},
+                    "workers": {"type": "integer", "minimum": 1, "maximum": 16},
+                    "authentication": {
+                        "type": "object",
+                        "properties": {
+                            "enabled": {"type": "boolean"},
+                            "token_expiry_hours": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 8760,
+                            },
+                            "secret_key": {"type": ["string", "null"]},
+                        },
+                    },
+                    "cors": {
+                        "type": "object",
+                        "properties": {
+                            "enabled": {"type": "boolean"},
+                            "origins": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                        },
+                    },
+                    "rate_limiting": {
+                        "type": "object",
+                        "properties": {
+                            "enabled": {"type": "boolean"},
+                            "requests_per_minute": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10000,
+                            },
+                        },
+                    },
+                    "ssl": {
+                        "type": "object",
+                        "properties": {
+                            "enabled": {"type": "boolean"},
+                            "cert_file": {"type": ["string", "null"]},
+                            "key_file": {"type": ["string", "null"]},
+                        },
+                    },
+                    "advanced": {
+                        "type": "object",
+                        "properties": {
+                            "reload": {"type": "boolean"},
+                            "log_level": {"type": "string"},
+                            "access_log": {"type": "boolean"},
+                        },
+                    },
                 },
             },
         },
@@ -310,3 +398,20 @@ class ConfigManager:
                 else:
                     keys.append(full_key)
         return keys
+
+    def ensure_api_secret_key(self) -> str:
+        """Ensure API secret key exists, generate if needed.
+
+        Returns:
+            The API secret key
+
+        Note:
+            Automatically generates and saves a secure random secret key
+            if one doesn't exist.
+        """
+        secret_key: Optional[str] = self.get("api.authentication.secret_key")
+        if not secret_key:
+            # Generate a secure random secret key (256 bits = 32 bytes)
+            secret_key = secrets.token_urlsafe(32)
+            self.set("api.authentication.secret_key", secret_key)
+        return secret_key

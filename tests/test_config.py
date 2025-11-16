@@ -334,3 +334,142 @@ class TestConfigManager:
         # Above maximum
         with pytest.raises(ValueError):
             config.set("process_detection.interval", 301)
+
+    def test_api_default_config(self, temp_config_path: Path) -> None:
+        """Test API default configuration values."""
+        config = ConfigManager(temp_config_path)
+
+        # API should be disabled by default
+        assert config.get("api.enabled") is False
+        assert config.get("api.host") == "localhost"
+        assert config.get("api.port") == 8000
+        assert config.get("api.workers") == 1
+
+        # Authentication should be enabled by default
+        assert config.get("api.authentication.enabled") is True
+        assert config.get("api.authentication.token_expiry_hours") == 24
+        assert config.get("api.authentication.secret_key") is None
+
+        # CORS should be enabled with default origins
+        assert config.get("api.cors.enabled") is True
+        assert "http://localhost:3000" in config.get("api.cors.origins")
+
+        # Rate limiting should be enabled
+        assert config.get("api.rate_limiting.enabled") is True
+        assert config.get("api.rate_limiting.requests_per_minute") == 60
+
+    def test_api_port_validation(self, temp_config_path: Path) -> None:
+        """Test API port range validation."""
+        config = ConfigManager(temp_config_path)
+
+        # Valid ports
+        config.set("api.port", 1)  # Min
+        config.set("api.port", 8000)  # Default
+        config.set("api.port", 65535)  # Max
+
+        # Below minimum
+        with pytest.raises(ValueError):
+            config.set("api.port", 0)
+
+        # Above maximum
+        with pytest.raises(ValueError):
+            config.set("api.port", 65536)
+
+    def test_api_workers_validation(self, temp_config_path: Path) -> None:
+        """Test API workers range validation."""
+        config = ConfigManager(temp_config_path)
+
+        # Valid workers
+        config.set("api.workers", 1)  # Min
+        config.set("api.workers", 4)  # Common
+        config.set("api.workers", 16)  # Max
+
+        # Below minimum
+        with pytest.raises(ValueError):
+            config.set("api.workers", 0)
+
+        # Above maximum
+        with pytest.raises(ValueError):
+            config.set("api.workers", 17)
+
+    def test_api_token_expiry_validation(self, temp_config_path: Path) -> None:
+        """Test API token expiry validation."""
+        config = ConfigManager(temp_config_path)
+
+        # Valid expiry times
+        config.set("api.authentication.token_expiry_hours", 1)  # Min
+        config.set("api.authentication.token_expiry_hours", 24)  # Default
+        config.set("api.authentication.token_expiry_hours", 8760)  # Max (1 year)
+
+        # Below minimum
+        with pytest.raises(ValueError):
+            config.set("api.authentication.token_expiry_hours", 0)
+
+        # Above maximum
+        with pytest.raises(ValueError):
+            config.set("api.authentication.token_expiry_hours", 8761)
+
+    def test_api_rate_limiting_validation(self, temp_config_path: Path) -> None:
+        """Test API rate limiting validation."""
+        config = ConfigManager(temp_config_path)
+
+        # Valid rate limits
+        config.set("api.rate_limiting.requests_per_minute", 1)  # Min
+        config.set("api.rate_limiting.requests_per_minute", 60)  # Default
+        config.set("api.rate_limiting.requests_per_minute", 10000)  # Max
+
+        # Below minimum
+        with pytest.raises(ValueError):
+            config.set("api.rate_limiting.requests_per_minute", 0)
+
+        # Above maximum
+        with pytest.raises(ValueError):
+            config.set("api.rate_limiting.requests_per_minute", 10001)
+
+    def test_ensure_api_secret_key(self, temp_config_path: Path) -> None:
+        """Test auto-generation of API secret key."""
+        config = ConfigManager(temp_config_path)
+
+        # Initially no secret key
+        assert config.get("api.authentication.secret_key") is None
+
+        # Ensure secret key - should generate one
+        secret_key1 = config.ensure_api_secret_key()
+        assert secret_key1 is not None
+        assert len(secret_key1) > 0
+
+        # Calling again should return the same key
+        secret_key2 = config.ensure_api_secret_key()
+        assert secret_key1 == secret_key2
+
+        # Key should be persisted in config
+        assert config.get("api.authentication.secret_key") == secret_key1
+
+    def test_api_cors_origins_array(self, temp_config_path: Path) -> None:
+        """Test API CORS origins as array."""
+        config = ConfigManager(temp_config_path)
+
+        # Set custom origins
+        custom_origins = ["http://example.com", "https://app.example.com"]
+        config.set("api.cors.origins", custom_origins)
+
+        # Verify
+        assert config.get("api.cors.origins") == custom_origins
+
+    def test_api_ssl_config(self, temp_config_path: Path) -> None:
+        """Test API SSL configuration."""
+        config = ConfigManager(temp_config_path)
+
+        # Default SSL should be disabled
+        assert config.get("api.ssl.enabled") is False
+        assert config.get("api.ssl.cert_file") is None
+        assert config.get("api.ssl.key_file") is None
+
+        # Set SSL config
+        config.set("api.ssl.enabled", True)
+        config.set("api.ssl.cert_file", "/path/to/cert.pem")
+        config.set("api.ssl.key_file", "/path/to/key.pem")
+
+        assert config.get("api.ssl.enabled") is True
+        assert config.get("api.ssl.cert_file") == "/path/to/cert.pem"
+        assert config.get("api.ssl.key_file") == "/path/to/key.pem"
