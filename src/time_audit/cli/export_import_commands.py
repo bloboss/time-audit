@@ -237,10 +237,11 @@ def import_command(
         if dry_run:
             console.print("[yellow]Dry run - showing first 5 entries:[/yellow]")
             for i, entry in enumerate(entries[:5], 1):
+                duration_hours = (entry.duration_seconds or 0) / 3600
                 console.print(
                     f"  {i}. {entry.task_name} - "
                     f"{entry.start_time.strftime('%Y-%m-%d %H:%M')} - "
-                    f"{entry.duration_seconds / 3600:.2f}h"
+                    f"{duration_hours:.2f}h"
                 )
             if len(entries) > 5:
                 console.print(f"  ... and {len(entries) - 5} more")

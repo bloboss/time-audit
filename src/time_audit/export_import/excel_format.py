@@ -54,8 +54,8 @@ class ExcelExporter(Exporter):
                 Font,
                 PatternFill,
             )
-            from openpyxl.utils import (
-                get_column_letter,  # type: ignore[import-untyped]  # noqa: F401
+            from openpyxl.utils import (  # type: ignore[import-untyped]
+                get_column_letter,  # noqa: F401
             )
         except ImportError:
             raise ImportError(

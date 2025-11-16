@@ -43,8 +43,8 @@ class WindowsService:
             import win32serviceutil  # type: ignore[import-untyped]
 
             # Service class is defined separately (see service_impl.py)
-            from time_audit.daemon.windows_service_impl import (
-                TimeAuditWindowsService,  # type: ignore[import-not-found]
+            from time_audit.daemon.windows_service_impl import (  # type: ignore[import-not-found]
+                TimeAuditWindowsService,
             )
 
             # Install service

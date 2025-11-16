@@ -217,7 +217,7 @@ class ConfigManager:
             'default'
         """
         keys = key.split(".")
-        value = self._config
+        value: Any = self._config
         for k in keys:
             if isinstance(value, dict):
                 value = value.get(k)

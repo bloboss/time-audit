@@ -48,6 +48,7 @@ dev = [
     "types-jsonschema>=4.0.0",
     "types-psutil>=5.0.0",
     "types-python-dateutil>=2.8.0",
+    "types-openpyxl>=3.0.0",
 ]
 api = [
     "fastapi>=0.100.0",
@@ -89,6 +90,8 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 strict = true
+# Ignore unused type:ignore comments (they may be needed for different platforms)
+warn_unused_ignores = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

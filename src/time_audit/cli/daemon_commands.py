@@ -88,7 +88,7 @@ def stop() -> None:
 
 
 @daemon.command()  # type: ignore[misc]
-def restart():
+def restart() -> None:
     """Restart the background daemon."""
     # Stop daemon
     ctx = click.get_current_context()
@@ -206,7 +206,7 @@ def logs(lines: int, follow: bool) -> None:
 
 
 @daemon.command()  # type: ignore[misc]
-def reload():
+def reload() -> None:
     """Reload daemon configuration."""
     client = IPCClient()
 
@@ -227,7 +227,7 @@ def reload():
 
 
 @daemon.command()  # type: ignore[misc]
-def install():
+def install() -> None:
     """Install daemon as system service (auto-start on boot)."""
     platform = get_platform()
 
@@ -285,7 +285,7 @@ def install():
 
 
 @daemon.command()  # type: ignore[misc]
-def uninstall():
+def uninstall() -> None:
     """Uninstall daemon system service."""
     platform = get_platform()
 
@@ -336,7 +336,7 @@ def uninstall():
 
 
 @daemon.command("enable")  # type: ignore[misc]
-def enable_service():
+def enable_service() -> None:
     """Enable daemon to start on boot."""
     platform = get_platform()
 
@@ -380,7 +380,7 @@ def enable_service():
 
 
 @daemon.command("disable")  # type: ignore[misc]
-def disable_service():
+def disable_service() -> None:
     """Disable daemon from starting on boot."""
     platform = get_platform()
 

@@ -119,10 +119,11 @@ def stop(ctx: click.Context, notes: Optional[str]) -> None:
     try:
         entry = tracker.stop(notes)
 
-        console.print(f"[green]✓[/green] Stopped tracking: {entry.task_name}")
-        console.print(f"  Duration: {format_duration(entry.duration_seconds)}")
-        if entry.project:
-            console.print(f"  Project: {entry.project}")  # type: ignore[union-attr]
+        if entry:
+            console.print(f"[green]✓[/green] Stopped tracking: {entry.task_name}")
+            console.print(f"  Duration: {format_duration(entry.duration_seconds)}")
+            if entry.project:
+                console.print(f"  Project: {entry.project}")
 
     except ValueError as e:
         error_console.print(f"[red]Error:[/red] {e}")
