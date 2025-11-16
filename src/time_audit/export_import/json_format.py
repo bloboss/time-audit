@@ -2,7 +2,6 @@
 
 import json
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Optional
 
 from time_audit.core.models import Entry
@@ -94,7 +93,7 @@ class JSONImporter(Importer):
 
         # Read and parse JSON
         try:
-            with open(self.input_path, "r", encoding="utf-8") as f:
+            with open(self.input_path, encoding="utf-8") as f:
                 data = json.load(f)
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON file: {e}")

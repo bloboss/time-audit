@@ -1,10 +1,5 @@
 """Tests for daemon state management."""
 
-import json
-from pathlib import Path
-
-import pytest  # type: ignore[import-not-found]
-
 from time_audit.daemon.state import DaemonState, PIDFileManager, StateManager
 
 

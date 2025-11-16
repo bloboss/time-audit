@@ -3,7 +3,6 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,7 @@ WantedBy=default.target
         self.systemd_dir = Path.home() / ".config" / "systemd" / "user"
         self.unit_file = self.systemd_dir / f"{self.SERVICE_NAME}.service"
 
-    def install(self) -> Tuple[bool, str]:
+    def install(self) -> tuple[bool, str]:
         """Install systemd service.
 
         Returns:
@@ -74,7 +73,7 @@ WantedBy=default.target
             logger.error(f"Failed to install systemd service: {e}")
             return False, str(e)
 
-    def uninstall(self) -> Tuple[bool, str]:
+    def uninstall(self) -> tuple[bool, str]:
         """Uninstall systemd service.
 
         Returns:
@@ -103,7 +102,7 @@ WantedBy=default.target
             logger.error(f"Failed to uninstall systemd service: {e}")
             return False, str(e)
 
-    def enable(self) -> Tuple[bool, str]:
+    def enable(self) -> tuple[bool, str]:
         """Enable service to start on boot.
 
         Returns:
@@ -124,7 +123,7 @@ WantedBy=default.target
         except Exception as e:
             return False, str(e)
 
-    def disable(self) -> Tuple[bool, str]:
+    def disable(self) -> tuple[bool, str]:
         """Disable service from starting on boot.
 
         Returns:
@@ -145,7 +144,7 @@ WantedBy=default.target
         except Exception as e:
             return False, str(e)
 
-    def start(self) -> Tuple[bool, str]:
+    def start(self) -> tuple[bool, str]:
         """Start the service.
 
         Returns:
@@ -166,7 +165,7 @@ WantedBy=default.target
         except Exception as e:
             return False, str(e)
 
-    def stop(self) -> Tuple[bool, str]:
+    def stop(self) -> tuple[bool, str]:
         """Stop the service.
 
         Returns:
@@ -189,7 +188,7 @@ WantedBy=default.target
         except Exception as e:
             return False, str(e)
 
-    def restart(self) -> Tuple[bool, str]:
+    def restart(self) -> tuple[bool, str]:
         """Restart the service.
 
         Returns:
@@ -210,7 +209,7 @@ WantedBy=default.target
         except Exception as e:
             return False, str(e)
 
-    def status(self) -> Tuple[bool, str]:
+    def status(self) -> tuple[bool, str]:
         """Get service status.
 
         Returns:

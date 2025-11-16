@@ -113,11 +113,11 @@ class IdleDetector:
                     ("dwTime", ctypes.c_uint),
                 ]
 
-            lastInputInfo = LASTINPUTINFO()
-            lastInputInfo.cbSize = ctypes.sizeof(lastInputInfo)
-            ctypes.windll.user32.GetLastInputInfo(ctypes.byref(lastInputInfo))  # type: ignore[attr-defined]
+            last_input_info = LASTINPUTINFO()
+            last_input_info.cbSize = ctypes.sizeof(last_input_info)
+            ctypes.windll.user32.GetLastInputInfo(ctypes.byref(last_input_info))  # type: ignore[attr-defined]
 
-            millis = ctypes.windll.kernel32.GetTickCount() - lastInputInfo.dwTime  # type: ignore[attr-defined]
+            millis = ctypes.windll.kernel32.GetTickCount() - last_input_info.dwTime  # type: ignore[attr-defined]
             return int(millis // 1000)
         except Exception:
             # Fallback

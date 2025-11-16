@@ -12,9 +12,9 @@ from time_audit.core.models import Category, Entry, ProcessRule, Project
 
 # Platform-specific imports for file locking
 if sys.platform == "win32":
-    import msvcrt  # type: ignore[import-not-found]
+    pass  # type: ignore[import-not-found]
 else:
-    import fcntl  # type: ignore[import-not-found]
+    pass  # type: ignore[import-not-found]
 
 
 def _lock_file(file_obj: Any, exclusive: bool = True) -> None:
@@ -203,7 +203,7 @@ class StorageManager:
         if not file_path.exists():
             return []
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             # Acquire shared lock
             _lock_file(f, exclusive=False)
 

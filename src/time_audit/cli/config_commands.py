@@ -3,8 +3,7 @@
 import json
 import subprocess
 import sys
-from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import click  # type: ignore[import-not-found]
 from rich.console import Console  # type: ignore[import-not-found]

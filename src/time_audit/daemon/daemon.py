@@ -8,7 +8,7 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from time_audit.automation import IdleDetector, Notifier, ProcessDetector
 from time_audit.core.config import ConfigManager
@@ -215,7 +215,7 @@ class TimeAuditDaemon:
             # Redirect standard file descriptors
             sys.stdout.flush()
             sys.stderr.flush()
-            with open(os.devnull, "r") as devnull:
+            with open(os.devnull) as devnull:
                 os.dup2(devnull.fileno(), sys.stdin.fileno())
             with open(os.devnull, "a+") as devnull:
                 os.dup2(devnull.fileno(), sys.stdout.fileno())
@@ -361,7 +361,7 @@ class TimeAuditDaemon:
 
         # Send notification
         if self.notifier:
-            minutes = idle_seconds // 60
+            idle_seconds // 60
             self.notifier.notify_idle(idle_seconds)
             current_state = self.state_manager.get()
             self.state_manager.update(
@@ -386,7 +386,7 @@ class TimeAuditDaemon:
         self.ipc_server.register_handler("stop", self._handle_stop)
         self.ipc_server.register_handler("reload", self._handle_reload)
 
-    def _handle_ping(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_ping(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle ping request.
 
         Args:
@@ -397,7 +397,7 @@ class TimeAuditDaemon:
         """
         return {"pong": True, "timestamp": datetime.now().isoformat()}
 
-    def _handle_status(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_status(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle status request.
 
         Args:
@@ -412,7 +412,7 @@ class TimeAuditDaemon:
             "state": state,
         }
 
-    def _handle_stop(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_stop(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle stop request.
 
         Args:
@@ -425,7 +425,7 @@ class TimeAuditDaemon:
         threading.Thread(target=self.stop, daemon=True).start()
         return {"stopping": True}
 
-    def _handle_reload(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_reload(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle reload configuration request.
 
         Args:

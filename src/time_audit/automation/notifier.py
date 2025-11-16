@@ -1,7 +1,7 @@
 """Desktop notifications for Time Audit."""
 
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class NotificationType(Enum):

@@ -1,14 +1,12 @@
 """Tests for CLI commands."""
 
 import tempfile
-from datetime import datetime
 from pathlib import Path
 
 import pytest  # type: ignore[import-not-found]
 from click.testing import CliRunner  # type: ignore[import-not-found]
 
 from time_audit.cli.main import cli
-from time_audit.core.storage import StorageManager
 
 
 @pytest.fixture  # type: ignore[misc]

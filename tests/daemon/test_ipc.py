@@ -2,9 +2,7 @@
 
 import json
 import socket
-import threading
 import time
-from pathlib import Path
 
 import pytest  # type: ignore[import-not-found]
 

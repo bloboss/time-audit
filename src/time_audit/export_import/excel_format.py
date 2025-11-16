@@ -2,7 +2,6 @@
 
 from collections import defaultdict
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Optional
 
 from time_audit.core.models import Entry
@@ -45,9 +44,19 @@ class ExcelExporter(Exporter):
         # Try to import openpyxl
         try:
             import openpyxl  # type: ignore[import-untyped]
-            from openpyxl.chart import BarChart, PieChart, Reference  # type: ignore[import-untyped]
-            from openpyxl.styles import Alignment, Font, PatternFill  # type: ignore[import-untyped]
-            from openpyxl.utils import get_column_letter  # type: ignore[import-untyped]
+            from openpyxl.chart import (  # type: ignore[import-untyped]  # noqa: F401
+                BarChart,
+                PieChart,
+                Reference,
+            )
+            from openpyxl.styles import (  # type: ignore[import-untyped]  # noqa: F401
+                Alignment,
+                Font,
+                PatternFill,
+            )
+            from openpyxl.utils import (
+                get_column_letter,  # type: ignore[import-untyped]  # noqa: F401
+            )
         except ImportError:
             raise ImportError(
                 "openpyxl is required for Excel export. " "Install with: pip install openpyxl"
@@ -149,9 +158,8 @@ class ExcelExporter(Exporter):
             entries: List of entries
             include_charts: Whether to include charts
         """
-        import openpyxl
-        from openpyxl.chart import BarChart, PieChart, Reference
-        from openpyxl.styles import Alignment, Font, PatternFill
+        from openpyxl.chart import PieChart, Reference
+        from openpyxl.styles import Font
 
         ws = wb.create_sheet("Summary", 0)  # Insert as first sheet
 
@@ -205,7 +213,6 @@ class ExcelExporter(Exporter):
         ws[f"B{row}"].font = Font(bold=True)
         row += 1
 
-        task_start_row = row
         for task, hours in sorted(task_time.items(), key=lambda x: x[1], reverse=True):
             ws[f"A{row}"] = task
             ws[f"B{row}"] = round(hours, 2)

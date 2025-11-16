@@ -1,7 +1,6 @@
 """Tests for JSON export and import."""
 
 import json
-import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -44,7 +43,7 @@ class TestJSONExporter:
         assert output_file.exists()
 
         # Read and verify JSON
-        with open(output_file, "r") as f:
+        with open(output_file) as f:
             data = json.load(f)
 
         assert "entries" in data
@@ -80,7 +79,7 @@ class TestJSONExporter:
 
         exporter.export_entries(entries, start_date, end_date)
 
-        with open(output_file, "r") as f:
+        with open(output_file) as f:
             data = json.load(f)
 
         # Should only have the entry from January 2025
@@ -102,7 +101,7 @@ class TestJSONExporter:
 
         exporter.export_entries(entries, include_metadata=True)
 
-        with open(output_file, "r") as f:
+        with open(output_file) as f:
             data = json.load(f)
 
         assert "metadata" in data
@@ -125,7 +124,7 @@ class TestJSONExporter:
 
         exporter.export_entries(entries, include_metadata=False)
 
-        with open(output_file, "r") as f:
+        with open(output_file) as f:
             data = json.load(f)
 
         assert "metadata" not in data
@@ -316,8 +315,8 @@ class TestJSONImporter:
 
         # Should skip invalid entry with validation disabled
         entries = importer.import_entries(validate=False)
-        # Note: All entries fail validation since Entry.from_dict will raise on missing required fields
-        # So we expect empty list when skipping invalid entries
+        # Note: All entries fail validation since Entry.from_dict will raise
+        # on missing required fields. Expect empty list when skipping invalid entries.
         assert len(entries) <= 1  # May be 1 or 0 depending on which entry is processed first
 
     def test_roundtrip_export_import(self, tmp_path: Path) -> None:

@@ -1,7 +1,7 @@
 """Report generation for time tracking data."""
 
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 
 from rich.console import Console  # type: ignore[import-not-found]

@@ -155,9 +155,8 @@ def switch(
     stopped, new_entry = tracker.switch(task_name, project, category, tag_list, notes)
 
     if stopped:
-        console.print(
-            f"[yellow]⏹[/yellow]  Stopped: {stopped.task_name} ({format_duration(stopped.duration_seconds)})"
-        )
+        duration_str = format_duration(stopped.duration_seconds)
+        console.print(f"[yellow]⏹[/yellow]  Stopped: {stopped.task_name} ({duration_str})")
 
     console.print(f"[green]▶[/green]  Started: {task_name}")
     if project:
@@ -253,7 +252,7 @@ def log(
                 end_date = start_date + timedelta(days=1)
             except ValueError:
                 console.print(
-                    f"[red]Error:[/red] Invalid date format. Use YYYY-MM-DD, 'today', or 'yesterday'"
+                    "[red]Error:[/red] Invalid date format. Use YYYY-MM-DD, 'today', or 'yesterday'"
                 )
                 sys.exit(1)
 
@@ -422,7 +421,7 @@ def report(
                 start_date = datetime.strptime(from_date, "%Y-%m-%d")
                 period_label = f"From {from_date}"
             except ValueError:
-                console.print(f"[red]Error:[/red] Invalid date format for --from. Use YYYY-MM-DD")
+                console.print("[red]Error:[/red] Invalid date format for --from. Use YYYY-MM-DD")
                 sys.exit(1)
 
         if to_date:
@@ -433,7 +432,7 @@ def report(
                 else:
                     period_label = f"Up to {to_date}"
             except ValueError:
-                console.print(f"[red]Error:[/red] Invalid date format for --to. Use YYYY-MM-DD")
+                console.print("[red]Error:[/red] Invalid date format for --to. Use YYYY-MM-DD")
                 sys.exit(1)
     else:
         # Use period

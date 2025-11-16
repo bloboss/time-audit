@@ -1,9 +1,5 @@
 """Tests for ProcessRule model."""
 
-from datetime import datetime
-
-import pytest  # type: ignore[import-not-found]
-
 from time_audit.core.models import ProcessRule
 
 

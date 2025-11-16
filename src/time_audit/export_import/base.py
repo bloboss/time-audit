@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-from time_audit.core.models import Category, Entry, Project
+from time_audit.core.models import Entry
 
 
 class Exporter(ABC):

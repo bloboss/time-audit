@@ -2,8 +2,6 @@
 
 from unittest.mock import Mock, patch
 
-import pytest  # type: ignore[import-not-found]
-
 from time_audit.automation.idle_detector import IdleDetector
 
 

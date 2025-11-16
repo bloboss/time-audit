@@ -2,11 +2,9 @@
 
 import os
 import platform
-import sys
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Tuple
 
 
 class Platform(Enum):
@@ -95,7 +93,7 @@ def get_log_file_path() -> Path:
     return log_dir / "daemon.log"
 
 
-def is_daemon_supported() -> Tuple[bool, str]:
+def is_daemon_supported() -> tuple[bool, str]:
     """Check if daemon is supported on this platform.
 
     Returns:

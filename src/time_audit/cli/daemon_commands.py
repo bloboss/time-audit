@@ -1,7 +1,6 @@
 """CLI commands for daemon management."""
 
 import sys
-from pathlib import Path
 
 import click  # type: ignore[import-not-found]
 from rich.console import Console  # type: ignore[import-not-found]
@@ -80,7 +79,7 @@ def stop() -> None:
 
     try:
         console.print("[cyan]Stopping daemon...[/cyan]")
-        result = client.call("stop")
+        client.call("stop")
         console.print("[green]✓[/green] Daemon stopped")
     except IPCError as e:
         console.print(f"[red]Error: {e}[/red]")
@@ -200,7 +199,7 @@ def logs(lines: int, follow: bool) -> None:
             pass
     else:
         # Show last N lines
-        with open(log_file, "r") as f:
+        with open(log_file) as f:
             all_lines = f.readlines()
             last_lines = all_lines[-lines:]
             console.print("".join(last_lines))

@@ -3,8 +3,6 @@
 import platform
 from pathlib import Path
 
-import pytest  # type: ignore[import-not-found]
-
 from time_audit.daemon.platform import (
     Platform,
     get_ipc_socket_path,

@@ -1,6 +1,5 @@
 """Tests for configuration manager."""
 
-import json
 import tempfile
 from pathlib import Path
 

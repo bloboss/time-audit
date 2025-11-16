@@ -4,8 +4,8 @@ from unittest.mock import Mock
 
 import pytest  # type: ignore[import-not-found]
 
-from time_audit.core.models import ProcessRule
 from time_audit.automation.rule_engine import RuleEngine
+from time_audit.core.models import ProcessRule
 
 
 class TestRuleEngine:

@@ -2,8 +2,6 @@
 
 from unittest.mock import Mock, patch
 
-import pytest  # type: ignore[import-not-found]
-
 from time_audit.automation.process_detector import ProcessDetector
 
 
@@ -126,7 +124,6 @@ class TestProcessDetector:
         detector = ProcessDetector()
 
         with patch("psutil.process_iter") as mock_iter:
-            import psutil  # type: ignore[import-untyped]
 
             # Process that raises NoSuchProcess
             def make_bad_process() -> Mock:  # type: ignore[no-untyped-def]

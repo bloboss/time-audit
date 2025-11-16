@@ -1,7 +1,6 @@
 """Windows Service integration."""
 
 import logging
-from typing import Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -33,19 +32,20 @@ class WindowsService:
                 "Windows service support requires pywin32. " "Install with: pip install pywin32"
             )
 
-    def install(self) -> Tuple[bool, str]:
+    def install(self) -> tuple[bool, str]:
         """Install Windows service.
 
         Returns:
             Tuple of (success, message)
         """
         try:
-            import sys
 
             import win32serviceutil  # type: ignore[import-untyped]
 
             # Service class is defined separately (see service_impl.py)
-            from time_audit.daemon.windows_service_impl import TimeAuditWindowsService  # type: ignore[import-not-found]
+            from time_audit.daemon.windows_service_impl import (
+                TimeAuditWindowsService,  # type: ignore[import-not-found]
+            )
 
             # Install service
             win32serviceutil.InstallService(
@@ -63,7 +63,7 @@ class WindowsService:
             logger.error(f"Failed to install Windows service: {e}")
             return False, str(e)
 
-    def uninstall(self) -> Tuple[bool, str]:
+    def uninstall(self) -> tuple[bool, str]:
         """Uninstall Windows service.
 
         Returns:
@@ -85,7 +85,7 @@ class WindowsService:
             logger.error(f"Failed to uninstall Windows service: {e}")
             return False, str(e)
 
-    def start(self) -> Tuple[bool, str]:
+    def start(self) -> tuple[bool, str]:
         """Start the service.
 
         Returns:
@@ -101,7 +101,7 @@ class WindowsService:
         except Exception as e:
             return False, str(e)
 
-    def stop(self) -> Tuple[bool, str]:
+    def stop(self) -> tuple[bool, str]:
         """Stop the service.
 
         Returns:
@@ -120,7 +120,7 @@ class WindowsService:
                 return True, "Service already stopped"
             return False, str(e)
 
-    def restart(self) -> Tuple[bool, str]:
+    def restart(self) -> tuple[bool, str]:
         """Restart the service.
 
         Returns:
@@ -136,7 +136,7 @@ class WindowsService:
         except Exception as e:
             return False, str(e)
 
-    def status(self) -> Tuple[bool, str]:
+    def status(self) -> tuple[bool, str]:
         """Get service status.
 
         Returns:
