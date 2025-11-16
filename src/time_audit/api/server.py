@@ -4,6 +4,7 @@ This module contains the main FastAPI application setup and server runner.
 The API provides programmatic access to all Time Audit functionality.
 """
 
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI  # type: ignore[import-untyped]
@@ -79,7 +80,8 @@ def run_server(
     port: int = 8000,
     reload: bool = False,
     workers: int = 1,
-    ssl: bool = False,
+    ssl_certfile: Optional[Path] = None,
+    ssl_keyfile: Optional[Path] = None,
     config: Optional[ConfigManager] = None,
 ) -> None:
     """Run the API server using Uvicorn.
@@ -89,7 +91,8 @@ def run_server(
         port: Port number to bind to
         reload: Enable auto-reload for development
         workers: Number of worker processes
-        ssl: Enable SSL/TLS
+        ssl_certfile: Path to SSL certificate file
+        ssl_keyfile: Path to SSL key file
         config: Optional configuration manager
 
     Example:
@@ -98,10 +101,13 @@ def run_server(
         >>>
         >>> # Production
         >>> run_server(host="0.0.0.0", port=8000, workers=4)
+        >>>
+        >>> # With SSL
+        >>> run_server(ssl_certfile=Path("cert.pem"), ssl_keyfile=Path("key.pem"))
 
     Note:
         This function blocks until the server is stopped.
-        SSL requires cert_file and key_file to be configured.
+        SSL requires both cert_file and key_file to be specified.
     """
     import uvicorn  # type: ignore[import-untyped]
 
@@ -120,18 +126,12 @@ def run_server(
         "access_log": config.get("api.advanced.access_log", True),
     }
 
-    # Add SSL if enabled
-    if ssl:
-        cert_file = config.get("api.ssl.cert_file")
-        key_file = config.get("api.ssl.key_file")
-
-        if not cert_file or not key_file:
-            raise ValueError("SSL enabled but cert_file or key_file not configured")
-
+    # Add SSL if cert and key provided
+    if ssl_certfile and ssl_keyfile:
         uvicorn_config.update(
             {
-                "ssl_certfile": cert_file,
-                "ssl_keyfile": key_file,
+                "ssl_certfile": str(ssl_certfile),
+                "ssl_keyfile": str(ssl_keyfile),
             }
         )
 

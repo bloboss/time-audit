@@ -11,6 +11,7 @@ from rich.panel import Panel  # type: ignore[import-not-found]
 from rich.table import Table  # type: ignore[import-not-found]
 
 from time_audit.analysis.reports import ReportGenerator
+from time_audit.cli.api_commands import api
 from time_audit.cli.config_commands import config
 from time_audit.cli.daemon_commands import daemon
 from time_audit.cli.export_import_commands import export_import
@@ -481,6 +482,7 @@ def report(
 
 
 # Register command groups
+cli.add_command(api)
 cli.add_command(config)
 cli.add_command(daemon)
 cli.add_command(export_import)
