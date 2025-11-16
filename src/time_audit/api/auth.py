@@ -8,9 +8,13 @@ from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from fastapi import Depends, HTTPException, status  # type: ignore[import-untyped]
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer  # type: ignore[import-untyped]
+from fastapi.security import (  # type: ignore[import-untyped]
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+)
 from jose import JWTError, jwt  # type: ignore[import-untyped]
 
+from time_audit.api.dependencies import get_config
 from time_audit.core.config import ConfigManager
 
 # Security scheme for dependency injection
@@ -55,11 +59,13 @@ def create_access_token(
 
 def verify_token(
     credentials: HTTPAuthorizationCredentials = Depends(security),
+    config: ConfigManager = Depends(get_config),
 ) -> dict[str, Any]:
     """Verify JWT token from request.
 
     Args:
         credentials: HTTP authorization credentials (injected by FastAPI)
+        config: Configuration manager (injected)
 
     Returns:
         Decoded token payload
@@ -71,8 +77,6 @@ def verify_token(
         This is a dependency function for FastAPI endpoints.
         Use with Depends(verify_token) to protect endpoints.
     """
-    # Get configuration
-    config = ConfigManager()
 
     # Check if authentication is enabled
     if not config.get("api.authentication.enabled", True):

@@ -6,31 +6,40 @@ components like configuration, storage, and the tracker.
 """
 
 from pathlib import Path
-from typing import Optional
+
+from fastapi import Request  # type: ignore[import-untyped]
 
 from time_audit.core.config import ConfigManager
 from time_audit.core.storage import StorageManager
 from time_audit.core.tracker import TimeTracker
 
 
-def get_config(config_path: Optional[Path] = None) -> ConfigManager:
+def get_config(request: Request = None) -> ConfigManager:  # type: ignore[assignment,misc]
     """Get configuration manager instance.
 
     Args:
-        config_path: Optional path to config file
+        request: FastAPI Request object (when used as dependency)
 
     Returns:
-        ConfigManager instance
+        ConfigManager instance from app state or new instance
 
     Note:
         This is a dependency function for FastAPI endpoints.
         Use with Depends(get_config) in endpoint parameters.
     """
-    return ConfigManager(config_path)
+    # If it's a Request object from FastAPI
+    if request is not None and hasattr(request, "app"):
+        if hasattr(request.app.state, "config"):
+            return request.app.state.config
+    # Fall back to default config
+    return ConfigManager()
 
 
-def get_storage() -> StorageManager:
+def get_storage(request: Request = None) -> StorageManager:  # type: ignore[assignment,misc]
     """Get storage instance.
+
+    Args:
+        request: FastAPI request object (injected) or None for direct call
 
     Returns:
         StorageManager instance
@@ -38,14 +47,18 @@ def get_storage() -> StorageManager:
     Note:
         This is a dependency function for FastAPI endpoints.
         Use with Depends(get_storage) in endpoint parameters.
+        Can also be called directly for testing.
     """
-    config = get_config()
+    config = get_config(request)
     data_dir = Path(config.get("general.data_dir", "~/.time-audit/data")).expanduser()
     return StorageManager(data_dir)
 
 
-def get_tracker() -> TimeTracker:
+def get_tracker(request: Request = None) -> TimeTracker:  # type: ignore[assignment,misc]
     """Get tracker instance.
+
+    Args:
+        request: FastAPI request object (injected) or None for direct call
 
     Returns:
         TimeTracker instance
@@ -53,6 +66,7 @@ def get_tracker() -> TimeTracker:
     Note:
         This is a dependency function for FastAPI endpoints.
         Use with Depends(get_tracker) in endpoint parameters.
+        Can also be called directly for testing.
     """
-    storage = get_storage()
+    storage = get_storage(request)
     return TimeTracker(storage)

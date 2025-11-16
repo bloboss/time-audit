@@ -42,13 +42,19 @@ def create_app(config: Optional[ConfigManager] = None) -> FastAPI:
         openapi_url="/openapi.json",
     )
 
+    # Store config in app state for dependency injection
+    app.state.config = config
+
     # Set up middleware
     setup_middleware(app, config)
 
     # Register routers
-    from time_audit.api.endpoints import system
+    from time_audit.api.endpoints import categories, entries, projects, system
 
     app.include_router(system.router, prefix="/api/v1", tags=["system"])
+    app.include_router(entries.router, prefix="/api/v1/entries", tags=["entries"])
+    app.include_router(projects.router, prefix="/api/v1/projects", tags=["projects"])
+    app.include_router(categories.router, prefix="/api/v1/categories", tags=["categories"])
 
     # Root endpoint
     @app.get("/", include_in_schema=False)

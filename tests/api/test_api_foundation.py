@@ -287,7 +287,7 @@ class TestDependencies:
 
     def test_get_config(self, temp_config_path: Path) -> None:
         """Test get_config dependency."""
-        config = get_config(temp_config_path)
+        config = get_config()  # Uses default config
         assert isinstance(config, ConfigManager)
 
     def test_get_config_default(self) -> None:

@@ -5,12 +5,12 @@ Each module defines a FastAPI router that is included in the main application.
 
 Available routers:
 - system: Health checks and system status
-- entries: Time entry CRUD and tracking (Week 2)
-- projects: Project management (Week 2)
-- categories: Category management (Week 2)
+- entries: Time entry CRUD and tracking
+- projects: Project management
+- categories: Category management
 - reports: Reports and analytics (Week 3)
 """
 
-__all__ = ["system"]
+__all__ = ["system", "entries", "projects", "categories"]
 
-from time_audit.api.endpoints import system  # noqa: F401
+from time_audit.api.endpoints import categories, entries, projects, system  # noqa: F401

@@ -348,6 +348,37 @@ class StorageManager:
                 return entry
         return None
 
+    def get_entry(self, entry_id: str) -> Optional[Entry]:
+        """Get a specific entry by ID.
+
+        Args:
+            entry_id: ID of the entry to retrieve (string or UUID)
+
+        Returns:
+            Entry object or None if not found
+        """
+        entries = self.load_entries()
+        # Convert to string for comparison since entry.id is UUID
+        entry_id_str = str(entry_id)
+        for entry in entries:
+            if str(entry.id) == entry_id_str:
+                return entry
+        return None
+
+    def update_entry(self, entry: Entry) -> None:
+        """Update an existing entry.
+
+        Args:
+            entry: Entry object with updated data
+
+        Note:
+            The entry must already exist (same ID).
+            This deletes the old entry and saves the updated one.
+        """
+        # Delete old entry and save new one
+        self.delete_entry(str(entry.id))
+        self.save_entry(entry)
+
     # Project operations
 
     def save_project(self, project: Project) -> None:
@@ -400,6 +431,45 @@ class StorageManager:
                 return project
         return None
 
+    def update_project(self, project: Project) -> None:
+        """Update an existing project.
+
+        Args:
+            project: Project object with updated data
+
+        Note:
+            This uses save_project which handles updates automatically.
+        """
+        self.save_project(project)
+
+    def delete_project(self, project_id: str) -> bool:
+        """Delete a project by ID.
+
+        Args:
+            project_id: ID of project to delete
+
+        Returns:
+            True if project was deleted, False if not found
+        """
+        projects = self._read_csv(self.projects_file)
+        original_count = len(projects)
+
+        # Filter out project with matching ID
+        projects = [p for p in projects if p["id"] != project_id]
+
+        if len(projects) == original_count:
+            return False
+
+        # Get fieldnames from first project or use defaults
+        fieldnames = (
+            list(projects[0].keys())
+            if projects
+            else ["id", "name", "description", "client", "active", "created_at", "updated_at"]
+        )
+
+        self._write_csv_atomic(self.projects_file, fieldnames, projects)
+        return True
+
     # Category operations
 
     def save_category(self, category: Category) -> None:
@@ -451,6 +521,45 @@ class StorageManager:
             if category.id == category_id:
                 return category
         return None
+
+    def update_category(self, category: Category) -> None:
+        """Update an existing category.
+
+        Args:
+            category: Category object with updated data
+
+        Note:
+            This uses save_category which handles updates automatically.
+        """
+        self.save_category(category)
+
+    def delete_category(self, category_id: str) -> bool:
+        """Delete a category by ID.
+
+        Args:
+            category_id: ID of category to delete
+
+        Returns:
+            True if category was deleted, False if not found
+        """
+        categories = self._read_csv(self.categories_file)
+        original_count = len(categories)
+
+        # Filter out category with matching ID
+        categories = [c for c in categories if c["id"] != category_id]
+
+        if len(categories) == original_count:
+            return False
+
+        # Get fieldnames from first category or use defaults
+        fieldnames = (
+            list(categories[0].keys())
+            if categories
+            else ["id", "name", "color", "created_at", "updated_at"]
+        )
+
+        self._write_csv_atomic(self.categories_file, fieldnames, categories)
+        return True
 
     # Process Rule Management
 

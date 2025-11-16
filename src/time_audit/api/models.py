@@ -46,7 +46,7 @@ class EntryResponse(BaseModel):
             EntryResponse instance
         """
         return cls(
-            id=entry.id,
+            id=str(entry.id),
             task_name=entry.task_name,
             start_time=entry.start_time,
             end_time=entry.end_time,
