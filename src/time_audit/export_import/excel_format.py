@@ -66,7 +66,8 @@ class ExcelExporter(Exporter):
         wb = openpyxl.Workbook()
 
         # Remove default sheet
-        wb.remove(wb.active)
+        if wb.active:
+            wb.remove(wb.active)
 
         # Create entries sheet
         self._create_entries_sheet(wb, filtered_entries)
