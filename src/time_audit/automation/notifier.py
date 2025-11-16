@@ -1,7 +1,7 @@
 """Desktop notifications for Time Audit."""
 
 from enum import Enum
-from typing import Optional
+from typing import Any
 
 
 class NotificationType(Enum):
@@ -28,7 +28,7 @@ class Notifier:
         self.backend = backend
         self._notifier = self._init_notifier()
 
-    def _init_notifier(self):
+    def _init_notifier(self) -> Any:
         """Initialize platform-specific notifier.
 
         Returns:
@@ -38,9 +38,9 @@ class Notifier:
             return None
 
         try:
-            from plyer import notification
+            from plyer import notification  # type: ignore[import-not-found]
 
-            return notification
+            return notification  # type: ignore[no-any-return]
         except ImportError:
             # Notifications not available
             return None
@@ -64,7 +64,7 @@ class Notifier:
             return
 
         try:
-            self._notifier.notify(
+            self._notifier.notify(  # type: ignore[attr-defined]
                 title=title,
                 message=message,
                 app_name="Time Audit",

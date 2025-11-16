@@ -2,10 +2,10 @@
 
 from unittest.mock import Mock
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
-from time_audit.core.models import ProcessRule
 from time_audit.automation.rule_engine import RuleEngine
+from time_audit.core.models import ProcessRule
 
 
 class TestRuleEngine:
@@ -90,12 +90,8 @@ class TestRuleEngine:
     def test_match_process_prioritizes_explicit_rules(self) -> None:
         """Test matching prioritizes explicit rules over learned ones."""
         storage = Mock()
-        learned_rule = ProcessRule(
-            pattern="code", task_name="Coding", learned=True, confidence=0.9
-        )
-        explicit_rule = ProcessRule(
-            pattern="code", task_name="Development", learned=False
-        )
+        learned_rule = ProcessRule(pattern="code", task_name="Coding", learned=True, confidence=0.9)
+        explicit_rule = ProcessRule(pattern="code", task_name="Development", learned=False)
         storage.load_rules.return_value = [learned_rule, explicit_rule]
 
         engine = RuleEngine(storage)
@@ -152,9 +148,7 @@ class TestRuleEngine:
     def test_match_process_skips_disabled_rules(self) -> None:
         """Test matching skips disabled rules."""
         storage = Mock()
-        disabled_rule = ProcessRule(
-            pattern="vscode", task_name="Development", enabled=False
-        )
+        disabled_rule = ProcessRule(pattern="vscode", task_name="Development", enabled=False)
         enabled_rule = ProcessRule(pattern="code", task_name="Coding", enabled=True)
         storage.load_rules.return_value = [disabled_rule, enabled_rule]
 
@@ -219,9 +213,7 @@ class TestRuleEngine:
 
         engine = RuleEngine(storage)
 
-        rule = engine.learn_rule(
-            process_name="slack", task_name="Communication", confidence=0.8
-        )
+        rule = engine.learn_rule(process_name="slack", task_name="Communication", confidence=0.8)
 
         assert rule.pattern == "slack"
         assert rule.task_name == "Communication"
@@ -256,9 +248,7 @@ class TestRuleEngine:
 
         engine = RuleEngine(storage)
 
-        rule = engine.learn_rule(
-            process_name="slack", task_name="Communication", confidence=0.9
-        )
+        rule = engine.learn_rule(process_name="slack", task_name="Communication", confidence=0.9)
 
         # Should update confidence (+0.1) and increment match count
         assert rule == existing_rule
@@ -268,9 +258,7 @@ class TestRuleEngine:
     def test_learn_rule_creates_separate_from_explicit(self) -> None:
         """Test learning creates separate rule alongside explicit rules."""
         storage = Mock()
-        explicit_rule = ProcessRule(
-            pattern="slack", task_name="Work Chat", learned=False
-        )
+        explicit_rule = ProcessRule(pattern="slack", task_name="Work Chat", learned=False)
         rules = [explicit_rule]
 
         def save_rule(rule):
@@ -288,9 +276,7 @@ class TestRuleEngine:
 
         engine = RuleEngine(storage)
 
-        rule = engine.learn_rule(
-            process_name="slack", task_name="Communication", confidence=0.9
-        )
+        rule = engine.learn_rule(process_name="slack", task_name="Communication", confidence=0.9)
 
         # Should create new learned rule with same pattern
         assert rule != explicit_rule
@@ -417,4 +403,3 @@ class TestRuleEngine:
         assert len(rules) == 2
         assert rule1 in rules
         assert rule2 in rules
-

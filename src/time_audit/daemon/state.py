@@ -6,7 +6,7 @@ import threading
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class DaemonState:
     idle_checks_count: int = 0
     notifications_sent: int = 0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert state to dictionary.
 
         Returns:
@@ -53,7 +53,7 @@ class DaemonState:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "DaemonState":
+    def from_dict(cls, data: dict[str, Any]) -> "DaemonState":
         """Create state from dictionary.
 
         Args:
@@ -111,7 +111,7 @@ class StateManager:
             return None
 
         try:
-            with open(self.state_file, "r") as f:
+            with open(self.state_file) as f:
                 data = json.load(f)
             self._state = DaemonState.from_dict(data)
             logger.info("Daemon state loaded")
@@ -168,7 +168,7 @@ class StateManager:
         with self._lock:
             return self._state
 
-    def get_dict(self) -> Dict[str, Any]:
+    def get_dict(self) -> dict[str, Any]:
         """Get current state as dictionary.
 
         Returns:
@@ -223,7 +223,7 @@ class PIDFileManager:
             return None
 
         try:
-            with open(self.pid_file, "r") as f:
+            with open(self.pid_file) as f:
                 pid = int(f.read().strip())
             return pid
         except (ValueError, OSError) as e:
@@ -250,9 +250,9 @@ class PIDFileManager:
             return False
 
         try:
-            import psutil
+            import psutil  # type: ignore[import-untyped]
 
-            return psutil.pid_exists(pid)
+            return bool(psutil.pid_exists(pid))
         except ImportError:
             # Fallback: try to send signal 0
             import os

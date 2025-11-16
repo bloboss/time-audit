@@ -1,11 +1,10 @@
 """Tests for configuration manager."""
 
-import json
 import tempfile
 from pathlib import Path
 
-import pytest
-import yaml
+import pytest  # type: ignore[import-not-found]
+import yaml  # type: ignore[import-untyped]
 
 from time_audit.core.config import ConfigManager
 

@@ -8,7 +8,7 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from time_audit.automation import IdleDetector, Notifier, ProcessDetector
 from time_audit.core.config import ConfigManager
@@ -64,7 +64,7 @@ class TimeAuditDaemon:
         self.data_dir = data_dir or Path(self.config.get("general.data_dir"))
 
         # Core components
-        self.tracker = TimeTracker(data_dir=self.data_dir)
+        self.tracker = TimeTracker(data_dir=self.data_dir)  # type: ignore[call-arg]
         self.state_manager = StateManager()
         self.pid_manager = PIDFileManager(get_pid_file_path())
         self.ipc_server = IPCServer()
@@ -128,9 +128,7 @@ class TimeAuditDaemon:
 
         # Start monitoring
         self.running = True
-        self._monitoring_thread = threading.Thread(
-            target=self._monitoring_loop, daemon=False
-        )
+        self._monitoring_thread = threading.Thread(target=self._monitoring_loop, daemon=False)
         self._monitoring_thread.start()
 
         logger.info(f"Daemon started (PID: {os.getpid()})")
@@ -186,9 +184,7 @@ class TimeAuditDaemon:
         # File handler
         file_handler = logging.FileHandler(log_file)
         file_handler.setLevel(log_level)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
 
@@ -219,7 +215,7 @@ class TimeAuditDaemon:
             # Redirect standard file descriptors
             sys.stdout.flush()
             sys.stderr.flush()
-            with open(os.devnull, "r") as devnull:
+            with open(os.devnull) as devnull:
                 os.dup2(devnull.fileno(), sys.stdin.fileno())
             with open(os.devnull, "a+") as devnull:
                 os.dup2(devnull.fileno(), sys.stdout.fileno())
@@ -287,9 +283,7 @@ class TimeAuditDaemon:
             threads.append(process_thread)
 
         if self.idle_detector:
-            idle_thread = threading.Thread(
-                target=self.idle_detector.start_monitoring, daemon=True
-            )
+            idle_thread = threading.Thread(target=self.idle_detector.start_monitoring, daemon=True)
             idle_thread.start()
             threads.append(idle_thread)
 
@@ -297,7 +291,7 @@ class TimeAuditDaemon:
         while self.running:
             try:
                 # Update state with current tracking info
-                current_entry = self.tracker.get_current_entry()
+                current_entry = self.tracker.get_current_entry()  # type: ignore[attr-defined]
                 if current_entry:
                     self.state_manager.update(
                         tracking=True,
@@ -330,12 +324,11 @@ class TimeAuditDaemon:
         logger.info(f"Process changed: {old_process} -> {new_process}")
 
         # Update state
+        current_state = self.state_manager.get()
         self.state_manager.update(
             last_detected_process=new_process,
             last_process_check=datetime.now().isoformat(),
-            process_checks_count=self.state_manager.get().process_checks_count + 1
-            if self.state_manager.get()
-            else 1,
+            process_checks_count=(current_state.process_checks_count + 1 if current_state else 1),
         )
 
         # TODO: Integrate with rule engine for automatic task switching
@@ -345,10 +338,9 @@ class TimeAuditDaemon:
                 title="Process Changed",
                 message=f"Detected: {new_process}",
             )
+            current_state = self.state_manager.get()
             self.state_manager.update(
-                notifications_sent=self.state_manager.get().notifications_sent + 1
-                if self.state_manager.get()
-                else 1,
+                notifications_sent=(current_state.notifications_sent + 1 if current_state else 1),
             )
 
     def _on_idle(self, idle_seconds: int) -> None:
@@ -360,22 +352,20 @@ class TimeAuditDaemon:
         logger.info(f"User idle for {idle_seconds} seconds")
 
         # Update state
+        current_state = self.state_manager.get()
         self.state_manager.update(
             is_idle=True,
             idle_since=datetime.now().isoformat(),
-            idle_checks_count=self.state_manager.get().idle_checks_count + 1
-            if self.state_manager.get()
-            else 1,
+            idle_checks_count=(current_state.idle_checks_count + 1 if current_state else 1),
         )
 
         # Send notification
         if self.notifier:
-            minutes = idle_seconds // 60
+            idle_seconds // 60
             self.notifier.notify_idle(idle_seconds)
+            current_state = self.state_manager.get()
             self.state_manager.update(
-                notifications_sent=self.state_manager.get().notifications_sent + 1
-                if self.state_manager.get()
-                else 1,
+                notifications_sent=(current_state.notifications_sent + 1 if current_state else 1),
             )
 
     def _on_active(self) -> None:
@@ -396,7 +386,7 @@ class TimeAuditDaemon:
         self.ipc_server.register_handler("stop", self._handle_stop)
         self.ipc_server.register_handler("reload", self._handle_reload)
 
-    def _handle_ping(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_ping(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle ping request.
 
         Args:
@@ -407,7 +397,7 @@ class TimeAuditDaemon:
         """
         return {"pong": True, "timestamp": datetime.now().isoformat()}
 
-    def _handle_status(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_status(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle status request.
 
         Args:
@@ -422,7 +412,7 @@ class TimeAuditDaemon:
             "state": state,
         }
 
-    def _handle_stop(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_stop(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle stop request.
 
         Args:
@@ -435,7 +425,7 @@ class TimeAuditDaemon:
         threading.Thread(target=self.stop, daemon=True).start()
         return {"stopping": True}
 
-    def _handle_reload(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_reload(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle reload configuration request.
 
         Args:

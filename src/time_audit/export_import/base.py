@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-from time_audit.core.models import Category, Entry, Project
+from time_audit.core.models import Entry
 
 
 class Exporter(ABC):
@@ -125,6 +125,4 @@ class Importer(ABC):
 
         expected_ext = self.get_file_extension()
         if self.input_path.suffix.lower() != expected_ext.lower():
-            raise ValueError(
-                f"Expected {expected_ext} file, got {self.input_path.suffix}"
-            )
+            raise ValueError(f"Expected {expected_ext} file, got {self.input_path.suffix}")

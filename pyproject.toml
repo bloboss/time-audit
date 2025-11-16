@@ -33,6 +33,8 @@ dependencies = [
     "psutil>=5.9.0",
     "rich>=13.0.0",
     "pyyaml>=6.0.0",
+    "jsonschema>=4.0.0",
+    "openpyxl>=3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -42,6 +44,11 @@ dev = [
     "black>=23.0.0",
     "mypy>=1.0.0",
     "ruff>=0.1.0",
+    "types-PyYAML>=6.0.0",
+    "types-jsonschema>=4.0.0",
+    "types-psutil>=5.0.0",
+    "types-python-dateutil>=2.8.0",
+    "types-openpyxl>=3.0.0",
 ]
 api = [
     "fastapi>=0.100.0",
@@ -73,6 +80,8 @@ target-version = ['py39']
 [tool.ruff]
 line-length = 100
 target-version = "py39"
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
 
 [tool.mypy]
@@ -81,6 +90,8 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 strict = true
+# Ignore unused type:ignore comments (they may be needed for different platforms)
+warn_unused_ignores = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -3,7 +3,6 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -42,13 +41,13 @@ class LaunchdService:
 </plist>
 """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize launchd service manager."""
         self.launch_agents_dir = Path.home() / "Library" / "LaunchAgents"
         self.plist_file = self.launch_agents_dir / f"{self.SERVICE_NAME}.plist"
         self.log_dir = Path.home() / ".time-audit" / "logs"
 
-    def install(self) -> Tuple[bool, str]:
+    def install(self) -> tuple[bool, str]:
         """Install launchd service.
 
         Returns:
@@ -85,7 +84,7 @@ class LaunchdService:
             logger.error(f"Failed to install launchd service: {e}")
             return False, str(e)
 
-    def uninstall(self) -> Tuple[bool, str]:
+    def uninstall(self) -> tuple[bool, str]:
         """Uninstall launchd service.
 
         Returns:
@@ -106,7 +105,7 @@ class LaunchdService:
             logger.error(f"Failed to uninstall launchd service: {e}")
             return False, str(e)
 
-    def enable(self) -> Tuple[bool, str]:
+    def enable(self) -> tuple[bool, str]:
         """Enable service (load into launchd).
 
         Returns:
@@ -130,7 +129,7 @@ class LaunchdService:
         except Exception as e:
             return False, str(e)
 
-    def disable(self) -> Tuple[bool, str]:
+    def disable(self) -> tuple[bool, str]:
         """Disable service (unload from launchd).
 
         Returns:
@@ -153,7 +152,7 @@ class LaunchdService:
         except Exception as e:
             return False, str(e)
 
-    def start(self) -> Tuple[bool, str]:
+    def start(self) -> tuple[bool, str]:
         """Start the service.
 
         Returns:
@@ -174,7 +173,7 @@ class LaunchdService:
         except Exception as e:
             return False, str(e)
 
-    def stop(self) -> Tuple[bool, str]:
+    def stop(self) -> tuple[bool, str]:
         """Stop the service.
 
         Returns:
@@ -197,7 +196,7 @@ class LaunchdService:
         except Exception as e:
             return False, str(e)
 
-    def restart(self) -> Tuple[bool, str]:
+    def restart(self) -> tuple[bool, str]:
         """Restart the service.
 
         Returns:
@@ -210,7 +209,7 @@ class LaunchdService:
 
         return self.start()
 
-    def status(self) -> Tuple[bool, str]:
+    def status(self) -> tuple[bool, str]:
         """Get service status.
 
         Returns:

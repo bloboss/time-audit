@@ -1,10 +1,8 @@
 """Tests for desktop notifications."""
 
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
-import pytest
-
-from time_audit.automation.notifier import Notifier, NotificationType
+from time_audit.automation.notifier import NotificationType, Notifier
 
 
 class TestNotifier:

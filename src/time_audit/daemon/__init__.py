@@ -9,7 +9,7 @@ The daemon provides:
 """
 
 from time_audit.daemon.daemon import TimeAuditDaemon
-from time_audit.daemon.ipc import IPCServer, IPCClient
+from time_audit.daemon.ipc import IPCClient, IPCServer
 from time_audit.daemon.state import DaemonState
 
 __all__ = ["TimeAuditDaemon", "IPCServer", "IPCClient", "DaemonState"]

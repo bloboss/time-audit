@@ -2,11 +2,9 @@
 
 import json
 import socket
-import threading
 import time
-from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.daemon.ipc import IPCClient, IPCError, IPCServer
 from time_audit.daemon.platform import Platform, get_platform
@@ -22,23 +20,23 @@ class TestIPCServer:
             pytest.skip("Windows named pipes require different testing approach")
         return tmp_path / "test.sock"
 
-    def test_create_server(self, socket_path):
+    def test_create_server(self, socket_path) -> None:
         """Test creating IPC server."""
         server = IPCServer(socket_path)
         assert server.socket_path == socket_path
         assert server.running is False
 
-    def test_register_handler(self, socket_path):
+    def test_register_handler(self, socket_path) -> None:
         """Test registering request handler."""
         server = IPCServer(socket_path)
 
-        def test_handler(params):
+        def test_handler(params) -> None:
             return {"result": "ok"}
 
         server.register_handler("test", test_handler)
         assert "test" in server.handlers
 
-    def test_start_and_stop_server(self, socket_path):
+    def test_start_and_stop_server(self, socket_path) -> None:
         """Test starting and stopping server."""
         server = IPCServer(socket_path)
 
@@ -53,12 +51,12 @@ class TestIPCServer:
         time.sleep(0.1)
         assert server.running is False
 
-    def test_server_handles_requests(self, socket_path):
+    def test_server_handles_requests(self, socket_path) -> None:
         """Test server handles requests correctly."""
         server = IPCServer(socket_path)
 
         # Register handler
-        def test_handler(params):
+        def test_handler(params) -> None:
             return {"echo": params.get("message")}
 
         server.register_handler("echo", test_handler)
@@ -100,7 +98,7 @@ class TestIPCServer:
         finally:
             server.stop()
 
-    def test_server_handles_unknown_method(self, socket_path):
+    def test_server_handles_unknown_method(self, socket_path) -> None:
         """Test server returns error for unknown method."""
         server = IPCServer(socket_path)
         server.start()
@@ -169,12 +167,12 @@ class TestIPCClient:
 
         server.stop()
 
-    def test_create_client(self, socket_path):
+    def test_create_client(self, socket_path) -> None:
         """Test creating IPC client."""
         client = IPCClient(socket_path)
         assert client.socket_path == socket_path
 
-    def test_client_call_success(self, socket_path, running_server):
+    def test_client_call_success(self, socket_path, running_server) -> None:
         """Test successful client call."""
         client = IPCClient(socket_path)
 
@@ -182,7 +180,7 @@ class TestIPCClient:
 
         assert result["pong"] is True
 
-    def test_client_call_with_params(self, socket_path, running_server):
+    def test_client_call_with_params(self, socket_path, running_server) -> None:
         """Test client call with parameters."""
         client = IPCClient(socket_path)
 
@@ -190,7 +188,7 @@ class TestIPCClient:
 
         assert result["echo"] == "test"
 
-    def test_client_call_unknown_method(self, socket_path, running_server):
+    def test_client_call_unknown_method(self, socket_path, running_server) -> None:
         """Test client call with unknown method raises error."""
         client = IPCClient(socket_path)
 
@@ -199,7 +197,7 @@ class TestIPCClient:
 
         assert "RPC error" in str(exc_info.value)
 
-    def test_client_call_connection_refused(self, socket_path):
+    def test_client_call_connection_refused(self, socket_path) -> None:
         """Test client call when server not running."""
         client = IPCClient(socket_path, timeout=1.0)
 
@@ -208,13 +206,13 @@ class TestIPCClient:
 
         assert "Failed to communicate" in str(exc_info.value)
 
-    def test_is_daemon_running_true(self, socket_path, running_server):
+    def test_is_daemon_running_true(self, socket_path, running_server) -> None:
         """Test is_daemon_running returns True when daemon is running."""
         client = IPCClient(socket_path)
 
         assert client.is_daemon_running() is True
 
-    def test_is_daemon_running_false(self, socket_path):
+    def test_is_daemon_running_false(self, socket_path) -> None:
         """Test is_daemon_running returns False when daemon is not running."""
         client = IPCClient(socket_path, timeout=0.5)
 
@@ -231,7 +229,7 @@ class TestIPCProtocol:
             pytest.skip("Windows named pipes require different testing approach")
         return tmp_path / "test.sock"
 
-    def test_json_rpc_request_format(self, socket_path):
+    def test_json_rpc_request_format(self, socket_path) -> None:
         """Test JSON-RPC request format."""
         client = IPCClient(socket_path)
         client._request_id = 0
@@ -250,7 +248,7 @@ class TestIPCProtocol:
         assert "method" in request
         assert "params" in request
 
-    def test_json_rpc_success_response_format(self, socket_path):
+    def test_json_rpc_success_response_format(self, socket_path) -> None:
         """Test JSON-RPC success response format."""
         server = IPCServer(socket_path)
 
@@ -261,7 +259,7 @@ class TestIPCProtocol:
         assert "result" in response
         assert "error" not in response
 
-    def test_json_rpc_error_response_format(self, socket_path):
+    def test_json_rpc_error_response_format(self, socket_path) -> None:
         """Test JSON-RPC error response format."""
         server = IPCServer(socket_path)
 

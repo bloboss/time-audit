@@ -61,9 +61,7 @@ class IdleDetector:
         try:
             import subprocess
 
-            result = subprocess.run(
-                ["xprintidle"], capture_output=True, text=True, timeout=1
-            )
+            result = subprocess.run(["xprintidle"], capture_output=True, text=True, timeout=1)
             if result.returncode == 0:
                 return int(result.stdout.strip()) // 1000  # Convert ms to seconds
         except (FileNotFoundError, subprocess.TimeoutExpired, ValueError):
@@ -71,12 +69,10 @@ class IdleDetector:
 
         # Try D-Bus for Wayland
         try:
-            import dbus
+            import dbus  # type: ignore[import-not-found]
 
             bus = dbus.SessionBus()
-            screensaver = bus.get_object(
-                "org.freedesktop.ScreenSaver", "/ScreenSaver"
-            )
+            screensaver = bus.get_object("org.freedesktop.ScreenSaver", "/ScreenSaver")
             idle_time = screensaver.GetSessionIdleTime()
             return int(idle_time)
         except Exception:
@@ -92,16 +88,12 @@ class IdleDetector:
             Seconds of idle time
         """
         try:
-            from Quartz import (
+            from Quartz import (  # type: ignore[import-not-found]
                 CGEventSourceSecondsSinceLastEventType,
                 kCGEventSourceStateHIDSystemState,
             )
 
-            return int(
-                CGEventSourceSecondsSinceLastEventType(
-                    kCGEventSourceStateHIDSystemState, 0
-                )
-            )
+            return int(CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateHIDSystemState, 0))
         except ImportError:
             # pyobjc not installed, use fallback
             return self._get_idle_time_fallback()
@@ -121,12 +113,12 @@ class IdleDetector:
                     ("dwTime", ctypes.c_uint),
                 ]
 
-            lastInputInfo = LASTINPUTINFO()
-            lastInputInfo.cbSize = ctypes.sizeof(lastInputInfo)
-            ctypes.windll.user32.GetLastInputInfo(ctypes.byref(lastInputInfo))
+            last_input_info = LASTINPUTINFO()
+            last_input_info.cbSize = ctypes.sizeof(last_input_info)
+            ctypes.windll.user32.GetLastInputInfo(ctypes.byref(last_input_info))  # type: ignore[attr-defined]
 
-            millis = ctypes.windll.kernel32.GetTickCount() - lastInputInfo.dwTime
-            return millis // 1000
+            millis = ctypes.windll.kernel32.GetTickCount() - last_input_info.dwTime  # type: ignore[attr-defined]
+            return int(millis // 1000)
         except Exception:
             # Fallback
             return self._get_idle_time_fallback()

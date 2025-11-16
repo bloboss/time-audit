@@ -2,7 +2,6 @@
 
 from collections import defaultdict
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Optional
 
 from time_audit.core.models import Entry
@@ -44,30 +43,38 @@ class ExcelExporter(Exporter):
 
         # Try to import openpyxl
         try:
-            import openpyxl
-            from openpyxl.chart import BarChart, PieChart, Reference
-            from openpyxl.styles import Alignment, Font, PatternFill
-            from openpyxl.utils import get_column_letter
+            import openpyxl  # type: ignore[import-untyped]
+            from openpyxl.chart import (  # type: ignore[import-untyped]  # noqa: F401
+                BarChart,
+                PieChart,
+                Reference,
+            )
+            from openpyxl.styles import (  # type: ignore[import-untyped]  # noqa: F401
+                Alignment,
+                Font,
+                PatternFill,
+            )
+            from openpyxl.utils import (  # type: ignore[import-untyped]
+                get_column_letter,  # noqa: F401
+            )
         except ImportError:
             raise ImportError(
-                "openpyxl is required for Excel export. "
-                "Install with: pip install openpyxl"
+                "openpyxl is required for Excel export. " "Install with: pip install openpyxl"
             )
 
         # Create workbook
         wb = openpyxl.Workbook()
 
         # Remove default sheet
-        wb.remove(wb.active)
+        if wb.active:
+            wb.remove(wb.active)
 
         # Create entries sheet
         self._create_entries_sheet(wb, filtered_entries)
 
         # Create summary sheet if requested
         if kwargs.get("include_summary", True):
-            self._create_summary_sheet(
-                wb, filtered_entries, kwargs.get("include_charts", True)
-            )
+            self._create_summary_sheet(wb, filtered_entries, kwargs.get("include_charts", True))
 
         # Save workbook
         wb.save(self.output_path)
@@ -99,9 +106,7 @@ class ExcelExporter(Exporter):
         ]
 
         # Write headers with formatting
-        header_fill = PatternFill(
-            start_color="366092", end_color="366092", fill_type="solid"
-        )
+        header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         header_font = Font(bold=True, color="FFFFFF")
 
         for col, header in enumerate(headers, start=1):
@@ -125,8 +130,8 @@ class ExcelExporter(Exporter):
             else:
                 ws.cell(row, 4, "-")
 
-            if entry.active_time_seconds:
-                ws.cell(row, 5, round(entry.active_time_seconds / 3600, 2))
+            if entry.active_duration_seconds:
+                ws.cell(row, 5, round(entry.active_duration_seconds / 3600, 2))
             else:
                 ws.cell(row, 5, "-")
 
@@ -154,19 +159,14 @@ class ExcelExporter(Exporter):
             entries: List of entries
             include_charts: Whether to include charts
         """
-        import openpyxl
-        from openpyxl.chart import BarChart, PieChart, Reference
-        from openpyxl.styles import Alignment, Font, PatternFill
+        from openpyxl.chart import PieChart, Reference
+        from openpyxl.styles import Font
 
         ws = wb.create_sheet("Summary", 0)  # Insert as first sheet
 
         # Calculate summary statistics
-        total_duration = sum(
-            e.duration_seconds for e in entries if e.duration_seconds
-        )
-        total_active = sum(
-            e.active_time_seconds for e in entries if e.active_time_seconds
-        )
+        total_duration = sum(e.duration_seconds for e in entries if e.duration_seconds)
+        total_active = sum(e.active_duration_seconds for e in entries if e.active_duration_seconds)
 
         # Time by task
         task_time: dict[str, float] = defaultdict(float)
@@ -214,7 +214,6 @@ class ExcelExporter(Exporter):
         ws[f"B{row}"].font = Font(bold=True)
         row += 1
 
-        task_start_row = row
         for task, hours in sorted(task_time.items(), key=lambda x: x[1], reverse=True):
             ws[f"A{row}"] = task
             ws[f"B{row}"] = round(hours, 2)
@@ -233,9 +232,7 @@ class ExcelExporter(Exporter):
         row += 1
 
         project_start_row = row
-        for project, hours in sorted(
-            project_time.items(), key=lambda x: x[1], reverse=True
-        ):
+        for project, hours in sorted(project_time.items(), key=lambda x: x[1], reverse=True):
             ws[f"A{row}"] = project
             ws[f"B{row}"] = round(hours, 2)
             row += 1

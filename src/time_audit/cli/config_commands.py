@@ -3,12 +3,11 @@
 import json
 import subprocess
 import sys
-from pathlib import Path
-from typing import Optional
+from typing import Any
 
-import click
-from rich.console import Console
-from rich.table import Table
+import click  # type: ignore[import-not-found]
+from rich.console import Console  # type: ignore[import-not-found]
+from rich.table import Table  # type: ignore[import-not-found]
 
 from time_audit.core.config import ConfigManager
 
@@ -16,7 +15,7 @@ console = Console()
 error_console = Console(stderr=True)
 
 
-@click.group()
+@click.group()  # type: ignore[misc]
 def config() -> None:
     """Manage Time Audit configuration.
 
@@ -25,9 +24,9 @@ def config() -> None:
     pass
 
 
-@config.command("show")
-@click.option("--json", "as_json", is_flag=True, help="Output as JSON")
-@click.pass_context
+@config.command("show")  # type: ignore[misc]
+@click.option("--json", "as_json", is_flag=True, help="Output as JSON")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def config_show(ctx: click.Context, as_json: bool) -> None:
     """Show all configuration settings.
 
@@ -48,7 +47,7 @@ def config_show(ctx: click.Context, as_json: bool) -> None:
 
     config_dict = config_mgr.to_dict()
 
-    def add_rows(prefix: str, data: dict) -> None:
+    def add_rows(prefix: str, data: dict[str, Any]) -> None:
         """Recursively add configuration rows."""
         for key, value in data.items():
             full_key = f"{prefix}.{key}" if prefix else key
@@ -62,9 +61,9 @@ def config_show(ctx: click.Context, as_json: bool) -> None:
     console.print(f"\nConfig file: {config_mgr.config_path}")
 
 
-@config.command("get")
-@click.argument("key")
-@click.pass_context
+@config.command("get")  # type: ignore[misc]
+@click.argument("key")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def config_get(ctx: click.Context, key: str) -> None:
     """Get a specific configuration value.
 
@@ -87,10 +86,10 @@ def config_get(ctx: click.Context, key: str) -> None:
         console.print(str(value))
 
 
-@config.command("set")
-@click.argument("key")
-@click.argument("value")
-@click.pass_context
+@config.command("set")  # type: ignore[misc]
+@click.argument("key")  # type: ignore[misc]
+@click.argument("value")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def config_set(ctx: click.Context, key: str, value: str) -> None:
     """Set a configuration value.
 
@@ -105,7 +104,7 @@ def config_set(ctx: click.Context, key: str, value: str) -> None:
     config_mgr = ConfigManager()
 
     # Try to convert value to appropriate type
-    converted_value: Optional[str | int | bool] = value
+    converted_value: Any = value
     if value.lower() in ("true", "yes", "1"):
         converted_value = True
     elif value.lower() in ("false", "no", "0"):
@@ -128,8 +127,8 @@ def config_set(ctx: click.Context, key: str, value: str) -> None:
         sys.exit(1)
 
 
-@config.command("edit")
-@click.pass_context
+@config.command("edit")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def config_edit(ctx: click.Context) -> None:
     """Edit configuration in default editor.
 
@@ -156,9 +155,7 @@ def config_edit(ctx: click.Context) -> None:
                 continue
 
     if not editor:
-        error_console.print(
-            "[red]Error:[/red] No editor found. Set $EDITOR environment variable."
-        )
+        error_console.print("[red]Error:[/red] No editor found. Set $EDITOR environment variable.")
         sys.exit(1)
 
     console.print(f"Opening {config_path} in {editor}...")
@@ -178,9 +175,9 @@ def config_edit(ctx: click.Context) -> None:
         sys.exit(1)
 
 
-@config.command("reset")
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")
-@click.pass_context
+@config.command("reset")  # type: ignore[misc]
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def config_reset(ctx: click.Context, yes: bool) -> None:
     """Reset configuration to defaults.
 
@@ -209,8 +206,8 @@ def config_reset(ctx: click.Context, yes: bool) -> None:
     console.print(f"Config file: {config_mgr.config_path}")
 
 
-@config.command("validate")
-@click.pass_context
+@config.command("validate")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def config_validate(ctx: click.Context) -> None:
     """Validate configuration file.
 
@@ -227,8 +224,8 @@ def config_validate(ctx: click.Context) -> None:
         sys.exit(1)
 
 
-@config.command("path")
-@click.pass_context
+@config.command("path")  # type: ignore[misc]
+@click.pass_context  # type: ignore[misc]
 def config_path(ctx: click.Context) -> None:
     """Show path to configuration file.
 

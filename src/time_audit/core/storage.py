@@ -1,14 +1,59 @@
 """CSV storage manager with atomic operations and validation."""
 
 import csv
-import fcntl
 import os
 import shutil
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from time_audit.core.models import Category, Entry, ProcessRule, Project
+
+# Platform-specific imports for file locking
+if sys.platform == "win32":
+    pass  # type: ignore[import-not-found]
+else:
+    pass  # type: ignore[import-not-found]
+
+
+def _lock_file(file_obj: Any, exclusive: bool = True) -> None:
+    """Lock a file in a cross-platform way.
+
+    Args:
+        file_obj: File object to lock
+        exclusive: If True, acquire exclusive lock; if False, acquire shared lock
+    """
+    if sys.platform == "win32":
+        # Windows file locking
+        import msvcrt  # type: ignore[import-not-found]
+
+        mode = msvcrt.LK_NBLCK if exclusive else msvcrt.LK_NBRLCK
+        msvcrt.locking(file_obj.fileno(), mode, 1)
+    else:
+        # Unix file locking
+        import fcntl  # type: ignore[import-not-found]
+
+        mode = fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH
+        fcntl.flock(file_obj.fileno(), mode)
+
+
+def _unlock_file(file_obj: Any) -> None:
+    """Unlock a file in a cross-platform way.
+
+    Args:
+        file_obj: File object to unlock
+    """
+    if sys.platform == "win32":
+        # Windows file unlocking
+        import msvcrt  # type: ignore[import-not-found]
+
+        msvcrt.locking(file_obj.fileno(), msvcrt.LK_UNLCK, 1)
+    else:
+        # Unix file unlocking
+        import fcntl  # type: ignore[import-not-found]
+
+        fcntl.flock(file_obj.fileno(), fcntl.LOCK_UN)
 
 
 class StorageManager:
@@ -70,7 +115,16 @@ class StorageManager:
         if not self.projects_file.exists():
             self._write_csv_atomic(
                 self.projects_file,
-                ["id", "name", "description", "client", "hourly_rate", "budget_hours", "active", "created_at"],
+                [
+                    "id",
+                    "name",
+                    "description",
+                    "client",
+                    "hourly_rate",
+                    "budget_hours",
+                    "active",
+                    "created_at",
+                ],
                 [],
             )
 
@@ -100,7 +154,9 @@ class StorageManager:
                 [],
             )
 
-    def _write_csv_atomic(self, file_path: Path, fieldnames: list[str], rows: list[dict]) -> None:
+    def _write_csv_atomic(
+        self, file_path: Path, fieldnames: list[str], rows: list[dict[str, Any]]
+    ) -> None:
         """Write CSV file atomically using temporary file and rename.
 
         Args:
@@ -113,7 +169,7 @@ class StorageManager:
         try:
             with open(temp_file, "w", newline="", encoding="utf-8") as f:
                 # Acquire exclusive lock
-                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                _lock_file(f, exclusive=True)
 
                 writer = csv.DictWriter(f, fieldnames=fieldnames)
                 writer.writeheader()
@@ -124,7 +180,7 @@ class StorageManager:
                 os.fsync(f.fileno())
 
                 # Release lock
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                _unlock_file(f)
 
             # Atomic rename
             temp_file.replace(file_path)
@@ -135,7 +191,7 @@ class StorageManager:
                 temp_file.unlink()
             raise e
 
-    def _read_csv(self, file_path: Path) -> list[dict]:
+    def _read_csv(self, file_path: Path) -> list[dict[str, Any]]:
         """Read CSV file with locking.
 
         Args:
@@ -147,16 +203,16 @@ class StorageManager:
         if not file_path.exists():
             return []
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             # Acquire shared lock
-            fcntl.flock(f.fileno(), fcntl.LOCK_SH)
+            _lock_file(f, exclusive=False)
 
             try:
                 reader = csv.DictReader(f)
                 rows = list(reader)
             finally:
                 # Release lock
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                _unlock_file(f)
 
         return rows
 
@@ -252,12 +308,30 @@ class StorageManager:
             return False
 
         # Get fieldnames from first entry or use defaults
-        fieldnames = list(entries[0].keys()) if entries else [
-            "id", "start_time", "end_time", "duration_seconds", "task_name",
-            "project", "category", "tags", "notes", "active_process",
-            "active_window", "idle_time_seconds", "manual_entry", "edited",
-            "auto_tracked", "rule_id", "created_at", "updated_at"
-        ]
+        fieldnames = (
+            list(entries[0].keys())
+            if entries
+            else [
+                "id",
+                "start_time",
+                "end_time",
+                "duration_seconds",
+                "task_name",
+                "project",
+                "category",
+                "tags",
+                "notes",
+                "active_process",
+                "active_window",
+                "idle_time_seconds",
+                "manual_entry",
+                "edited",
+                "auto_tracked",
+                "rule_id",
+                "created_at",
+                "updated_at",
+            ]
+        )
 
         self._write_csv_atomic(self.entries_file, fieldnames, entries)
         return True
@@ -465,19 +539,23 @@ class StorageManager:
         if len(rules) == original_count:
             return False
 
-        fieldnames = list(rules[0].keys()) if rules else [
-            "id",
-            "pattern",
-            "task_name",
-            "project",
-            "category",
-            "tags",
-            "enabled",
-            "learned",
-            "confidence",
-            "match_count",
-            "created_at",
-        ]
+        fieldnames = (
+            list(rules[0].keys())
+            if rules
+            else [
+                "id",
+                "pattern",
+                "task_name",
+                "project",
+                "category",
+                "tags",
+                "enabled",
+                "learned",
+                "confidence",
+                "match_count",
+                "created_at",
+            ]
+        )
 
         self._write_csv_atomic(self.rules_file, fieldnames, rules)
         return True

@@ -4,8 +4,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
-import pytest
-
 from time_audit.core.models import Category, Entry, Project
 
 

@@ -1,16 +1,16 @@
 """Tests for time tracker."""
 
 import tempfile
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from time_audit.core.storage import StorageManager
 from time_audit.core.tracker import TimeTracker
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def tracker() -> TimeTracker:
     """Create a time tracker with temporary storage."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -148,7 +148,7 @@ class TestTimeTracker:
     def test_get_entries_all(self, tracker: TimeTracker) -> None:
         """Test getting all entries."""
         for i in range(5):
-            entry = tracker.add_manual_entry(
+            tracker.add_manual_entry(
                 task_name=f"Task {i}",
                 start_time=datetime(2025, 11, 16, 9 + i, 0, 0),
                 end_time=datetime(2025, 11, 16, 9 + i, 30, 0),

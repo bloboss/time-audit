@@ -4,7 +4,7 @@ import platform
 import subprocess
 from typing import Callable, Optional
 
-import psutil
+import psutil  # type: ignore[import-untyped]
 
 
 class ProcessDetector:
@@ -64,7 +64,7 @@ class ProcessDetector:
                 pid = int(result.stdout.strip())
                 try:
                     process = psutil.Process(pid)
-                    return process.name()
+                    return str(process.name())
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     pass
         except (FileNotFoundError, subprocess.TimeoutExpired, ValueError):
@@ -89,7 +89,7 @@ class ProcessDetector:
                         try:
                             pid = int(parts[2])
                             process = psutil.Process(pid)
-                            return process.name()
+                            return str(process.name())
                         except (ValueError, psutil.NoSuchProcess, psutil.AccessDenied):
                             pass
         except (FileNotFoundError, subprocess.TimeoutExpired):
@@ -105,12 +105,12 @@ class ProcessDetector:
             Process name or None
         """
         try:
-            from AppKit import NSWorkspace
+            from AppKit import NSWorkspace  # type: ignore[import-not-found]
 
             workspace = NSWorkspace.sharedWorkspace()
             active_app = workspace.activeApplication()
             if active_app:
-                return active_app.get("NSApplicationName")
+                return str(active_app.get("NSApplicationName"))
         except ImportError:
             # pyobjc not installed, use fallback
             pass
@@ -125,13 +125,13 @@ class ProcessDetector:
             Process name or None
         """
         try:
-            import win32gui
-            import win32process
+            import win32gui  # type: ignore[import-untyped]
+            import win32process  # type: ignore[import-untyped]
 
             hwnd = win32gui.GetForegroundWindow()
             _, pid = win32process.GetWindowThreadProcessId(hwnd)
             process = psutil.Process(pid)
-            return process.name()
+            return str(process.name())
         except ImportError:
             # pywin32 not installed, use fallback
             pass
@@ -163,7 +163,7 @@ class ProcessDetector:
             # Filter out system processes
             for name, _ in processes:
                 if name and not name.startswith(("System", "kernel", "systemd")):
-                    return name
+                    return str(name)
 
         return None
 

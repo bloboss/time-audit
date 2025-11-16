@@ -1,12 +1,11 @@
 """CLI commands for daemon management."""
 
 import sys
-from pathlib import Path
 
-import click
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
+import click  # type: ignore[import-not-found]
+from rich.console import Console  # type: ignore[import-not-found]
+from rich.panel import Panel  # type: ignore[import-not-found]
+from rich.table import Table  # type: ignore[import-not-found]
 
 from time_audit.daemon.ipc import IPCClient, IPCError
 from time_audit.daemon.platform import Platform, get_platform
@@ -14,20 +13,20 @@ from time_audit.daemon.platform import Platform, get_platform
 console = Console()
 
 
-@click.group()
-def daemon():
+@click.group()  # type: ignore[misc]
+def daemon() -> None:
     """Manage the Time Audit background daemon."""
     pass
 
 
-@daemon.command()
-@click.option(
+@daemon.command()  # type: ignore[misc]
+@click.option(  # type: ignore[misc]
     "--foreground",
     "-f",
     is_flag=True,
     help="Run daemon in foreground (don't daemonize)",
 )
-def start(foreground: bool):
+def start(foreground: bool) -> None:
     """Start the background daemon."""
     from time_audit.daemon import TimeAuditDaemon
     from time_audit.daemon.ipc import IPCClient
@@ -73,14 +72,14 @@ def start(foreground: bool):
             sys.exit(1)
 
 
-@daemon.command()
-def stop():
+@daemon.command()  # type: ignore[misc]
+def stop() -> None:
     """Stop the background daemon."""
     client = IPCClient()
 
     try:
         console.print("[cyan]Stopping daemon...[/cyan]")
-        result = client.call("stop")
+        client.call("stop")
         console.print("[green]✓[/green] Daemon stopped")
     except IPCError as e:
         console.print(f"[red]Error: {e}[/red]")
@@ -88,8 +87,8 @@ def stop():
         sys.exit(1)
 
 
-@daemon.command()
-def restart():
+@daemon.command()  # type: ignore[misc]
+def restart() -> None:
     """Restart the background daemon."""
     # Stop daemon
     ctx = click.get_current_context()
@@ -104,9 +103,9 @@ def restart():
     ctx.invoke(start)
 
 
-@daemon.command()
-@click.option("--verbose", "-v", is_flag=True, help="Show detailed status")
-def status(verbose: bool):
+@daemon.command()  # type: ignore[misc]
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed status")  # type: ignore[misc]
+def status(verbose: bool) -> None:
     """Show daemon status."""
     client = IPCClient()
 
@@ -177,10 +176,10 @@ def status(verbose: bool):
         sys.exit(1)
 
 
-@daemon.command()
-@click.option("--lines", "-n", default=50, help="Number of log lines to show")
-@click.option("--follow", "-f", is_flag=True, help="Follow log output")
-def logs(lines: int, follow: bool):
+@daemon.command()  # type: ignore[misc]
+@click.option("--lines", "-n", default=50, help="Number of log lines to show")  # type: ignore[misc]
+@click.option("--follow", "-f", is_flag=True, help="Follow log output")  # type: ignore[misc]
+def logs(lines: int, follow: bool) -> None:
     """View daemon logs."""
     from time_audit.daemon.platform import get_log_file_path
 
@@ -200,14 +199,14 @@ def logs(lines: int, follow: bool):
             pass
     else:
         # Show last N lines
-        with open(log_file, "r") as f:
+        with open(log_file) as f:
             all_lines = f.readlines()
             last_lines = all_lines[-lines:]
             console.print("".join(last_lines))
 
 
-@daemon.command()
-def reload():
+@daemon.command()  # type: ignore[misc]
+def reload() -> None:
     """Reload daemon configuration."""
     client = IPCClient()
 
@@ -227,8 +226,8 @@ def reload():
         sys.exit(1)
 
 
-@daemon.command()
-def install():
+@daemon.command()  # type: ignore[misc]
+def install() -> None:
     """Install daemon as system service (auto-start on boot)."""
     platform = get_platform()
 
@@ -251,7 +250,7 @@ def install():
         elif platform == Platform.MACOS:
             from time_audit.daemon.launchd import LaunchdService
 
-            service = LaunchdService()
+            service = LaunchdService()  # type: ignore[assignment]
             success, message = service.install()
 
             if success:
@@ -265,7 +264,7 @@ def install():
         elif platform == Platform.WINDOWS:
             from time_audit.daemon.windows_service import WindowsService
 
-            service = WindowsService()
+            service = WindowsService()  # type: ignore[assignment]
             success, message = service.install()
 
             if success:
@@ -285,8 +284,8 @@ def install():
         sys.exit(1)
 
 
-@daemon.command()
-def uninstall():
+@daemon.command()  # type: ignore[misc]
+def uninstall() -> None:
     """Uninstall daemon system service."""
     platform = get_platform()
 
@@ -306,7 +305,7 @@ def uninstall():
         elif platform == Platform.MACOS:
             from time_audit.daemon.launchd import LaunchdService
 
-            service = LaunchdService()
+            service = LaunchdService()  # type: ignore[assignment]
             success, message = service.uninstall()
 
             if success:
@@ -318,7 +317,7 @@ def uninstall():
         elif platform == Platform.WINDOWS:
             from time_audit.daemon.windows_service import WindowsService
 
-            service = WindowsService()
+            service = WindowsService()  # type: ignore[assignment]
             success, message = service.uninstall()
 
             if success:
@@ -336,8 +335,8 @@ def uninstall():
         sys.exit(1)
 
 
-@daemon.command("enable")
-def enable_service():
+@daemon.command("enable")  # type: ignore[misc]
+def enable_service() -> None:
     """Enable daemon to start on boot."""
     platform = get_platform()
 
@@ -357,7 +356,7 @@ def enable_service():
         elif platform == Platform.MACOS:
             from time_audit.daemon.launchd import LaunchdService
 
-            service = LaunchdService()
+            service = LaunchdService()  # type: ignore[assignment]
             success, message = service.enable()
 
             if success:
@@ -380,8 +379,8 @@ def enable_service():
         sys.exit(1)
 
 
-@daemon.command("disable")
-def disable_service():
+@daemon.command("disable")  # type: ignore[misc]
+def disable_service() -> None:
     """Disable daemon from starting on boot."""
     platform = get_platform()
 
@@ -401,7 +400,7 @@ def disable_service():
         elif platform == Platform.MACOS:
             from time_audit.daemon.launchd import LaunchdService
 
-            service = LaunchdService()
+            service = LaunchdService()  # type: ignore[assignment]
             success, message = service.disable()
 
             if success:
@@ -411,9 +410,7 @@ def disable_service():
                 sys.exit(1)
 
         elif platform == Platform.WINDOWS:
-            console.print(
-                "[yellow]Use Windows Services Manager to disable auto-start[/yellow]"
-            )
+            console.print("[yellow]Use Windows Services Manager to disable auto-start[/yellow]")
 
         else:
             console.print("[red]Unsupported platform for system service[/red]")

@@ -1,7 +1,6 @@
 """iCalendar (iCal) export and import functionality."""
 
-from datetime import datetime, timedelta
-from pathlib import Path
+from datetime import datetime
 from typing import Any, Optional
 
 from time_audit.core.models import Entry
@@ -126,8 +125,8 @@ class ICalExporter(Exporter):
             hours = entry.duration_seconds / 3600
             description_parts.append(f"Duration: {hours:.2f} hours")
 
-        if entry.active_time_seconds:
-            active_hours = entry.active_time_seconds / 3600
+        if entry.active_duration_seconds:
+            active_hours = entry.active_duration_seconds / 3600
             description_parts.append(f"Active Time: {active_hours:.2f} hours")
 
         if entry.notes:
@@ -194,7 +193,7 @@ class ICalImporter(Importer):
         self.validate_input_path()
 
         # Read iCal file
-        with open(self.input_path, "r", encoding="utf-8") as f:
+        with open(self.input_path, encoding="utf-8") as f:
             content = f.read()
 
         # Parse events

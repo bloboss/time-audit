@@ -1,10 +1,10 @@
 """Platform-specific utilities for daemon operations."""
 
+import os
 import platform
-import sys
+import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Tuple
 
 
 class Platform(Enum):
@@ -45,8 +45,14 @@ def get_ipc_socket_path() -> Path:
     plat = get_platform()
 
     if plat in (Platform.LINUX, Platform.MACOS):
-        # Use XDG_RUNTIME_DIR if available, otherwise /tmp
-        runtime_dir = Path(sys.prefix).parent / ".time-audit" / "runtime"
+        # Use XDG_RUNTIME_DIR if available, otherwise fall back to temp directory
+        # This ensures short paths and proper permissions
+        xdg_runtime = os.environ.get("XDG_RUNTIME_DIR")
+        if xdg_runtime:
+            runtime_dir = Path(xdg_runtime) / "time-audit"
+        else:
+            # Use system temp directory to avoid permission issues
+            runtime_dir = Path(tempfile.gettempdir()) / "time-audit" / f"user-{os.getuid()}"
         runtime_dir.mkdir(parents=True, exist_ok=True)
         return runtime_dir / "daemon.sock"
     elif plat == Platform.WINDOWS:
@@ -87,7 +93,7 @@ def get_log_file_path() -> Path:
     return log_dir / "daemon.log"
 
 
-def is_daemon_supported() -> Tuple[bool, str]:
+def is_daemon_supported() -> tuple[bool, str]:
     """Check if daemon is supported on this platform.
 
     Returns:
@@ -101,7 +107,7 @@ def is_daemon_supported() -> Tuple[bool, str]:
     # Check for required modules
     if plat == Platform.WINDOWS:
         try:
-            import win32api  # noqa: F401
+            import win32api  # type: ignore[import-untyped]  # noqa: F401
         except ImportError:
             return (
                 False,

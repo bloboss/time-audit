@@ -8,7 +8,7 @@ import logging
 import socket
 import threading
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 from time_audit.daemon.platform import Platform, get_ipc_socket_path, get_platform
 
@@ -37,10 +37,10 @@ class IPCServer:
         self.platform = get_platform()
         self.socket: Optional[socket.socket] = None
         self.running = False
-        self.handlers: Dict[str, Callable] = {}
+        self.handlers: dict[str, Callable[..., Any]] = {}
         self._server_thread: Optional[threading.Thread] = None
 
-    def register_handler(self, method: str, handler: Callable) -> None:
+    def register_handler(self, method: str, handler: Callable[..., Any]) -> None:
         """Register a handler for a JSON-RPC method.
 
         Args:
@@ -83,13 +83,11 @@ class IPCServer:
     def _start_windows_server(self) -> None:
         """Start Windows named pipe server."""
         try:
-            import win32file
-            import win32pipe
+            import win32file  # type: ignore[import-untyped]  # noqa: F401
+            import win32pipe  # type: ignore[import-untyped]  # noqa: F401
 
             self.running = True
-            self._server_thread = threading.Thread(
-                target=self._accept_loop_windows, daemon=True
-            )
+            self._server_thread = threading.Thread(target=self._accept_loop_windows, daemon=True)
             self._server_thread.start()
             logger.info(f"IPC server started on {self.socket_path}")
         except ImportError:
@@ -119,9 +117,9 @@ class IPCServer:
 
     def _accept_loop_windows(self) -> None:
         """Accept client connections (Windows named pipes)."""
-        import pywintypes
-        import win32file
-        import win32pipe
+        import pywintypes  # type: ignore[import-untyped]
+        import win32file  # type: ignore[import-untyped]
+        import win32pipe  # type: ignore[import-untyped]
 
         while self.running:
             try:
@@ -230,7 +228,7 @@ class IPCServer:
         finally:
             win32file.CloseHandle(pipe)
 
-    def _process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _process_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Process a JSON-RPC request.
 
         Args:
@@ -253,9 +251,7 @@ class IPCServer:
         # Find handler
         handler = self.handlers.get(method)
         if not handler:
-            return self._create_error_response(
-                request_id, -32601, f"Method not found: {method}"
-            )
+            return self._create_error_response(request_id, -32601, f"Method not found: {method}")
 
         # Call handler
         try:
@@ -265,15 +261,13 @@ class IPCServer:
             logger.error(f"Error in handler for {method}: {e}")
             return self._create_error_response(request_id, -32603, str(e))
 
-    def _create_success_response(
-        self, request_id: Optional[Any], result: Any
-    ) -> Dict[str, Any]:
+    def _create_success_response(self, request_id: Optional[Any], result: Any) -> dict[str, Any]:
         """Create a JSON-RPC success response."""
         return {"jsonrpc": "2.0", "id": request_id, "result": result}
 
     def _create_error_response(
         self, request_id: Optional[Any], code: int, message: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a JSON-RPC error response."""
         return {
             "jsonrpc": "2.0",
@@ -324,7 +318,7 @@ class IPCClient:
         self.platform = get_platform()
         self._request_id = 0
 
-    def call(self, method: str, params: Optional[Dict[str, Any]] = None) -> Any:
+    def call(self, method: str, params: Optional[dict[str, Any]] = None) -> Any:
         """Call a remote method.
 
         Args:
@@ -357,7 +351,7 @@ class IPCClient:
 
         return response.get("result")
 
-    def _send_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Send request and receive response.
 
         Args:
@@ -376,7 +370,7 @@ class IPCClient:
         else:
             raise IPCError(f"Unsupported platform: {self.platform}")
 
-    def _send_request_unix(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_request_unix(self, request: dict[str, Any]) -> dict[str, Any]:
         """Send request via Unix socket.
 
         Args:
@@ -406,12 +400,12 @@ class IPCClient:
                     break
 
             response = json.loads(response_data.decode("utf-8"))
-            return response
+            return response  # type: ignore[no-any-return]
 
         finally:
             sock.close()
 
-    def _send_request_windows(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_request_windows(self, request: dict[str, Any]) -> dict[str, Any]:
         """Send request via Windows named pipe.
 
         Args:
@@ -422,7 +416,7 @@ class IPCClient:
         """
         try:
             import win32file
-            import win32pipe
+            import win32pipe  # noqa: F401
         except ImportError:
             raise IPCError("pywin32 is required for Windows daemon support")
 
@@ -446,7 +440,7 @@ class IPCClient:
             result, response_data = win32file.ReadFile(handle, 65536)
             response = json.loads(response_data.decode("utf-8"))
 
-            return response
+            return response  # type: ignore[no-any-return]
 
         finally:
             if handle:
