@@ -328,9 +328,7 @@ class TimeAuditDaemon:
         self.state_manager.update(
             last_detected_process=new_process,
             last_process_check=datetime.now().isoformat(),
-            process_checks_count=(
-                current_state.process_checks_count + 1 if current_state else 1
-            ),
+            process_checks_count=(current_state.process_checks_count + 1 if current_state else 1),
         )
 
         # TODO: Integrate with rule engine for automatic task switching
@@ -342,11 +340,7 @@ class TimeAuditDaemon:
             )
             current_state = self.state_manager.get()
             self.state_manager.update(
-                notifications_sent=(
-                    current_state.notifications_sent + 1
-                    if current_state
-                    else 1
-                ),
+                notifications_sent=(current_state.notifications_sent + 1 if current_state else 1),
             )
 
     def _on_idle(self, idle_seconds: int) -> None:
@@ -362,9 +356,7 @@ class TimeAuditDaemon:
         self.state_manager.update(
             is_idle=True,
             idle_since=datetime.now().isoformat(),
-            idle_checks_count=(
-                current_state.idle_checks_count + 1 if current_state else 1
-            ),
+            idle_checks_count=(current_state.idle_checks_count + 1 if current_state else 1),
         )
 
         # Send notification
@@ -373,11 +365,7 @@ class TimeAuditDaemon:
             self.notifier.notify_idle(idle_seconds)
             current_state = self.state_manager.get()
             self.state_manager.update(
-                notifications_sent=(
-                    current_state.notifications_sent + 1
-                    if current_state
-                    else 1
-                ),
+                notifications_sent=(current_state.notifications_sent + 1 if current_state else 1),
             )
 
     def _on_active(self) -> None:

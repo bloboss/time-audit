@@ -1,7 +1,9 @@
 """Platform-specific utilities for daemon operations."""
 
+import os
 import platform
 import sys
+import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import Tuple
@@ -45,8 +47,14 @@ def get_ipc_socket_path() -> Path:
     plat = get_platform()
 
     if plat in (Platform.LINUX, Platform.MACOS):
-        # Use XDG_RUNTIME_DIR if available, otherwise /tmp
-        runtime_dir = Path(sys.prefix).parent / ".time-audit" / "runtime"
+        # Use XDG_RUNTIME_DIR if available, otherwise fall back to temp directory
+        # This ensures short paths and proper permissions
+        xdg_runtime = os.environ.get("XDG_RUNTIME_DIR")
+        if xdg_runtime:
+            runtime_dir = Path(xdg_runtime) / "time-audit"
+        else:
+            # Use system temp directory to avoid permission issues
+            runtime_dir = Path(tempfile.gettempdir()) / "time-audit" / f"user-{os.getuid()}"
         runtime_dir.mkdir(parents=True, exist_ok=True)
         return runtime_dir / "daemon.sock"
     elif plat == Platform.WINDOWS:

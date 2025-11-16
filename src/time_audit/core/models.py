@@ -116,7 +116,9 @@ class Entry:
             notes=data["notes"] if data["notes"] else None,
             active_process=data.get("active_process") if data.get("active_process") else None,
             active_window=data.get("active_window") if data.get("active_window") else None,
-            idle_time_seconds=int(data.get("idle_time_seconds", 0)) if data.get("idle_time_seconds") else 0,
+            idle_time_seconds=(
+                int(data.get("idle_time_seconds", 0)) if data.get("idle_time_seconds") else 0
+            ),
             manual_entry=bool(data.get("manual_entry", False)),
             edited=bool(data.get("edited", False)),
             auto_tracked=bool(data.get("auto_tracked", False)),
