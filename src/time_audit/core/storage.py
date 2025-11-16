@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from time_audit.core.models import Category, Entry, Project
+from time_audit.core.models import Category, Entry, ProcessRule, Project
 
 
 class StorageManager:
@@ -27,6 +27,7 @@ class StorageManager:
         self.entries_file = self.data_dir / "entries.csv"
         self.projects_file = self.data_dir / "projects.csv"
         self.categories_file = self.data_dir / "categories.csv"
+        self.rules_file = self.data_dir / "rules.csv"
         self.state_dir = self.data_dir.parent / "state"
         self.backup_dir = self.data_dir.parent / "backups"
 
@@ -77,6 +78,25 @@ class StorageManager:
             self._write_csv_atomic(
                 self.categories_file,
                 ["id", "name", "color", "parent_category", "billable"],
+                [],
+            )
+
+        if not self.rules_file.exists():
+            self._write_csv_atomic(
+                self.rules_file,
+                [
+                    "id",
+                    "pattern",
+                    "task_name",
+                    "project",
+                    "category",
+                    "tags",
+                    "enabled",
+                    "learned",
+                    "confidence",
+                    "match_count",
+                    "created_at",
+                ],
                 [],
             )
 
@@ -357,3 +377,107 @@ class StorageManager:
             if category.id == category_id:
                 return category
         return None
+
+    # Process Rule Management
+
+    def save_rule(self, rule: ProcessRule) -> None:
+        """Save or update a process rule.
+
+        Args:
+            rule: ProcessRule to save
+        """
+        rules = self._read_csv(self.rules_file)
+        rule_dict = rule.to_dict()
+
+        # Find and update existing rule, or append new one
+        found = False
+        for i, row in enumerate(rules):
+            if row["id"] == rule.id:
+                rules[i] = rule_dict
+                found = True
+                break
+
+        if not found:
+            rules.append(rule_dict)
+
+        fieldnames = [
+            "id",
+            "pattern",
+            "task_name",
+            "project",
+            "category",
+            "tags",
+            "enabled",
+            "learned",
+            "confidence",
+            "match_count",
+            "created_at",
+        ]
+        self._write_csv_atomic(self.rules_file, fieldnames, rules)
+
+    def load_rules(self, enabled_only: bool = False) -> list[ProcessRule]:
+        """Load all process rules.
+
+        Args:
+            enabled_only: If True, only return enabled rules
+
+        Returns:
+            List of ProcessRule objects
+        """
+        rows = self._read_csv(self.rules_file)
+        rules = [ProcessRule.from_dict(row) for row in rows]
+
+        if enabled_only:
+            rules = [r for r in rules if r.enabled]
+
+        return rules
+
+    def get_rule(self, rule_id: str) -> Optional[ProcessRule]:
+        """Get rule by ID.
+
+        Args:
+            rule_id: Rule ID
+
+        Returns:
+            ProcessRule or None if not found
+        """
+        rules = self.load_rules()
+        for rule in rules:
+            if rule.id == rule_id:
+                return rule
+        return None
+
+    def delete_rule(self, rule_id: str) -> bool:
+        """Delete a process rule.
+
+        Args:
+            rule_id: ID of rule to delete
+
+        Returns:
+            True if rule was deleted, False if not found
+        """
+        rules = self._read_csv(self.rules_file)
+        original_count = len(rules)
+
+        # Remove rule with matching ID
+        rules = [r for r in rules if r["id"] != rule_id]
+
+        if len(rules) == original_count:
+            return False
+
+        fieldnames = list(rules[0].keys()) if rules else [
+            "id",
+            "pattern",
+            "task_name",
+            "project",
+            "category",
+            "tags",
+            "enabled",
+            "learned",
+            "confidence",
+            "match_count",
+            "created_at",
+        ]
+
+        self._write_csv_atomic(self.rules_file, fieldnames, rules)
+        return True

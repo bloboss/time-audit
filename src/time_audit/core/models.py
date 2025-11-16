@@ -216,3 +216,84 @@ class Category:
             parent_category=data["parent_category"] if data["parent_category"] else None,
             billable=bool(data.get("billable", True)),
         )
+
+
+@dataclass
+class ProcessRule:
+    """Rule for automatic process detection.
+
+    Attributes:
+        id: Unique identifier
+        pattern: Regex pattern for process name matching
+        task_name: Task name to use when rule matches
+        project: Project identifier (optional)
+        category: Category identifier (optional)
+        tags: Tags to apply (optional)
+        enabled: Whether rule is active
+        learned: Whether rule was learned from user behavior
+        confidence: Confidence score for learned rules (0-1)
+        match_count: Number of times this rule has matched
+        created_at: When rule was created
+    """
+
+    pattern: str
+    task_name: str
+    id: str = field(default_factory=lambda: str(uuid4()))
+    project: Optional[str] = None
+    category: Optional[str] = None
+    tags: list[str] = field(default_factory=list)
+    enabled: bool = True
+    learned: bool = False
+    confidence: float = 1.0
+    match_count: int = 0
+    created_at: datetime = field(default_factory=datetime.now)
+
+    def matches(self, process_name: str) -> bool:
+        """Check if process name matches this rule.
+
+        Args:
+            process_name: Process name to check
+
+        Returns:
+            True if process name matches pattern
+        """
+        import re
+
+        try:
+            return bool(re.search(self.pattern, process_name, re.IGNORECASE))
+        except re.error:
+            # Invalid regex pattern
+            return False
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for CSV/JSON serialization."""
+        return {
+            "id": self.id,
+            "pattern": self.pattern,
+            "task_name": self.task_name,
+            "project": self.project or "",
+            "category": self.category or "",
+            "tags": ",".join(self.tags),
+            "enabled": self.enabled,
+            "learned": self.learned,
+            "confidence": self.confidence,
+            "match_count": self.match_count,
+            "created_at": self.created_at.isoformat(),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ProcessRule":
+        """Create ProcessRule from dictionary (CSV/JSON deserialization)."""
+        return cls(
+            id=data["id"],
+            pattern=data["pattern"],
+            task_name=data["task_name"],
+            project=data["project"] if data["project"] else None,
+            category=data["category"] if data["category"] else None,
+            tags=[t.strip() for t in data["tags"].split(",") if t.strip()],
+            enabled=bool(data.get("enabled", True)),
+            learned=bool(data.get("learned", False)),
+            confidence=float(data.get("confidence", 1.0)),
+            match_count=int(data.get("match_count", 0)),
+            created_at=datetime.fromisoformat(data["created_at"]),
+        )
