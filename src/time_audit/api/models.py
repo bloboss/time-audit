@@ -5,9 +5,12 @@ All models use Pydantic for automatic validation and serialization.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from pydantic import BaseModel, Field  # type: ignore[import-untyped]
+
+if TYPE_CHECKING:
+    from time_audit.core.models import Category, Entry, Project
 
 # ============================================================================
 # Response Models
@@ -36,7 +39,7 @@ class EntryResponse(BaseModel):
         from_attributes = True
 
     @classmethod
-    def from_entry(cls, entry):  # type: ignore[no-untyped-def]
+    def from_entry(cls, entry: "Entry") -> "EntryResponse":
         """Create response from Entry model.
 
         Args:
@@ -76,7 +79,7 @@ class ProjectResponse(BaseModel):
         from_attributes = True
 
     @classmethod
-    def from_project(cls, project):  # type: ignore[no-untyped-def]
+    def from_project(cls, project: "Project") -> "ProjectResponse":
         """Create response from Project model.
 
         Args:
@@ -107,7 +110,7 @@ class CategoryResponse(BaseModel):
         from_attributes = True
 
     @classmethod
-    def from_category(cls, category):  # type: ignore[no-untyped-def]
+    def from_category(cls, category: "Category") -> "CategoryResponse":
         """Create response from Category model.
 
         Args:
@@ -304,7 +307,7 @@ class BreakdownReportResponse(BaseModel):
     """Response model for breakdown reports."""
 
     breakdown_type: str  # "project" or "category"
-    items: list[ProjectBreakdown] | list[CategoryBreakdown]
+    items: Union[list[ProjectBreakdown], list[CategoryBreakdown]]
     total_duration_seconds: int
 
 

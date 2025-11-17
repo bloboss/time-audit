@@ -117,12 +117,17 @@ def get_token_expiry_seconds(config: ConfigManager) -> int:
     return hours * 3600
 
 
-def create_token_for_user(config: ConfigManager, user_id: str = "cli-user") -> dict[str, Any]:
+def create_token_for_user(
+    config: ConfigManager,
+    user_id: str = "cli-user",
+    expires_delta: Optional[timedelta] = None,
+) -> dict[str, Any]:
     """Create a complete token response.
 
     Args:
         config: Configuration manager
         user_id: User identifier for the token
+        expires_delta: Optional custom expiry duration. If None, uses config value.
 
     Returns:
         Dictionary with access_token, token_type, and expires_in
@@ -136,8 +141,9 @@ def create_token_for_user(config: ConfigManager, user_id: str = "cli-user") -> d
     secret_key = config.ensure_api_secret_key()
 
     # Get expiry time
-    expiry_hours = config.get("api.authentication.token_expiry_hours", 24)
-    expires_delta = timedelta(hours=expiry_hours)
+    if expires_delta is None:
+        expiry_hours = config.get("api.authentication.token_expiry_hours", 24)
+        expires_delta = timedelta(hours=expiry_hours)
 
     # Create token
     access_token = create_access_token(

@@ -30,7 +30,8 @@ def get_config(request: Request = None) -> ConfigManager:  # type: ignore[assign
     # If it's a Request object from FastAPI
     if request is not None and hasattr(request, "app"):
         if hasattr(request.app.state, "config"):
-            return request.app.state.config
+            config: ConfigManager = request.app.state.config
+            return config
     # Fall back to default config
     return ConfigManager()
 

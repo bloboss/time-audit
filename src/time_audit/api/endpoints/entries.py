@@ -5,7 +5,7 @@ tracking control (start/stop/current).
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status  # type: ignore[import-untyped]
 
@@ -34,7 +34,7 @@ async def list_entries(
     from_date: Optional[str] = Query(None, description="Filter from date (YYYY-MM-DD)"),
     to_date: Optional[str] = Query(None, description="Filter to date (YYYY-MM-DD)"),
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> list[EntryResponse]:
     """List time entries with pagination and filtering.
 
@@ -87,7 +87,7 @@ async def list_entries(
 @router.get("/current", response_model=Optional[EntryResponse])
 async def get_current_entry(
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> Optional[EntryResponse]:
     """Get currently tracking entry.
 
@@ -118,7 +118,7 @@ async def get_current_entry(
 async def start_tracking(
     request: StartEntryRequest,
     tracker: TimeTracker = Depends(get_tracker),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> EntryResponse:
     """Start tracking a new task.
 
@@ -161,7 +161,7 @@ async def start_tracking(
 async def stop_tracking(
     request: StopEntryRequest,
     tracker: TimeTracker = Depends(get_tracker),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> EntryResponse:
     """Stop current tracking.
 
@@ -184,6 +184,11 @@ async def stop_tracking(
     """
     try:
         entry = tracker.stop(notes=request.notes)
+        if entry is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No active tracking session to stop",
+            )
         return EntryResponse.from_entry(entry)
     except ValueError as e:
         raise HTTPException(
@@ -196,7 +201,7 @@ async def stop_tracking(
 async def get_entry(
     entry_id: str,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> EntryResponse:
     """Get a specific entry by ID.
 
@@ -227,7 +232,7 @@ async def get_entry(
 async def create_entry(
     request: CreateEntryRequest,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> EntryResponse:
     """Create a manual time entry.
 
@@ -276,7 +281,7 @@ async def update_entry(
     entry_id: str,
     request: UpdateEntryRequest,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> EntryResponse:
     """Update an existing entry.
 
@@ -322,11 +327,8 @@ async def update_entry(
     if request.notes is not None:
         entry.notes = request.notes
 
-    # Recalculate duration if times changed
-    if request.start_time is not None or request.end_time is not None:
-        if entry.end_time:
-            duration = entry.end_time - entry.start_time
-            entry.duration_seconds = int(duration.total_seconds())
+    # Duration is automatically calculated from start_time and end_time
+    # via the Entry.duration_seconds property, so no manual calculation needed
 
     storage.update_entry(entry)
     return EntryResponse.from_entry(entry)
@@ -336,7 +338,7 @@ async def update_entry(
 async def delete_entry(
     entry_id: str,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> None:
     """Delete an entry.
 

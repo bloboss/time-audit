@@ -3,6 +3,8 @@
 This module provides CRUD operations for projects and project statistics.
 """
 
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, status  # type: ignore[import-untyped]
 from pydantic import BaseModel  # type: ignore[import-untyped]
 
@@ -32,7 +34,7 @@ class ProjectStats(BaseModel):
 @router.get("/", response_model=list[ProjectResponse])
 async def list_projects(
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> list[ProjectResponse]:
     """List all projects.
 
@@ -63,7 +65,7 @@ async def list_projects(
 async def get_project(
     project_id: str,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> ProjectResponse:
     """Get a specific project by ID.
 
@@ -94,7 +96,7 @@ async def get_project(
 async def create_project(
     request: CreateProjectRequest,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> ProjectResponse:
     """Create a new project.
 
@@ -141,7 +143,7 @@ async def update_project(
     project_id: str,
     request: UpdateProjectRequest,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> ProjectResponse:
     """Update an existing project.
 
@@ -189,7 +191,7 @@ async def update_project(
 async def delete_project(
     project_id: str,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> None:
     """Delete a project.
 
@@ -218,7 +220,7 @@ async def delete_project(
 async def get_project_stats(
     project_id: str,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> ProjectStats:
     """Get statistics for a project.
 

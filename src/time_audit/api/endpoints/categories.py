@@ -3,6 +3,8 @@
 This module provides CRUD operations for categories.
 """
 
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, status  # type: ignore[import-untyped]
 
 from time_audit.api.auth import verify_token
@@ -21,7 +23,7 @@ router = APIRouter()
 @router.get("/", response_model=list[CategoryResponse])
 async def list_categories(
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> list[CategoryResponse]:
     """List all categories.
 
@@ -50,7 +52,7 @@ async def list_categories(
 async def get_category(
     category_id: str,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> CategoryResponse:
     """Get a specific category by ID.
 
@@ -81,7 +83,7 @@ async def get_category(
 async def create_category(
     request: CreateCategoryRequest,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> CategoryResponse:
     """Create a new category.
 
@@ -126,7 +128,7 @@ async def update_category(
     category_id: str,
     request: UpdateCategoryRequest,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> CategoryResponse:
     """Update an existing category.
 
@@ -170,7 +172,7 @@ async def update_category(
 async def delete_category(
     category_id: str,
     storage: StorageManager = Depends(get_storage),
-    _: dict = Depends(verify_token),
+    _: dict[str, Any] = Depends(verify_token),
 ) -> None:
     """Delete a category.
 

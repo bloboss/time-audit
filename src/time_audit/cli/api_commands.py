@@ -7,6 +7,7 @@ including starting the server, generating tokens, and checking status.
 import sys
 from datetime import timedelta
 from pathlib import Path
+from typing import Optional
 
 import click
 
@@ -29,12 +30,12 @@ def api() -> None:
 @click.option("--ssl-key", type=click.Path(exists=True), help="Path to SSL key file")
 @click.option("--config", "config_path", type=click.Path(exists=True), help="Path to config file")
 def serve(
-    host: str | None,
-    port: int | None,
+    host: Optional[str],
+    port: Optional[int],
     reload: bool,
-    ssl_cert: str | None,
-    ssl_key: str | None,
-    config_path: str | None,
+    ssl_cert: Optional[str],
+    ssl_key: Optional[str],
+    config_path: Optional[str],
 ) -> None:
     """Start the API server.
 
@@ -119,7 +120,7 @@ def token() -> None:
 @click.option("--copy", is_flag=True, help="Copy token to clipboard")
 @click.option("--config", "config_path", type=click.Path(exists=True), help="Path to config file")
 def create_token_cmd(
-    user_id: str, expires: int | None, copy: bool, config_path: str | None
+    user_id: str, expires: Optional[int], copy: bool, config_path: Optional[str]
 ) -> None:
     """Create a new authentication token.
 
@@ -163,7 +164,7 @@ def create_token_cmd(
     # Copy to clipboard if requested
     if copy:
         try:
-            import pyperclip  # type: ignore[import-not-found]
+            import pyperclip  # type: ignore[import-untyped]
 
             pyperclip.copy(token_data["access_token"])
             click.echo()
@@ -180,7 +181,7 @@ def create_token_cmd(
 
 @api.command()
 @click.option("--config", "config_path", type=click.Path(exists=True), help="Path to config file")
-def status(config_path: str | None) -> None:
+def status(config_path: Optional[str]) -> None:
     """Show API configuration status.
 
     Examples:

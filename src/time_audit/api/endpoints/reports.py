@@ -347,7 +347,7 @@ async def get_breakdown_report(
     """
     # Parse period or custom dates
     if period:
-        period_from, period_to, _ = _parse_period(period)
+        period_from, period_to, period_label = _parse_period(period)
     else:
         period_from = datetime.fromisoformat(from_date) if from_date else None
         period_to = datetime.fromisoformat(to_date) if to_date else None

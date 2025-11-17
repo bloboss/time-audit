@@ -124,7 +124,8 @@ async def get_productivity_metrics(
 
     # Calculate entries per day
     if from_date:
-        days = (to_date or datetime.now() - from_date).days + 1
+        end_date = to_date if to_date else datetime.now()
+        days = (end_date - from_date).days + 1
         entries_per_day = len(filtered_entries) / max(days, 1)
     else:
         # For "all time", calculate based on actual date range
